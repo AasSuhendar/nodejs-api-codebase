@@ -27,12 +27,11 @@ ADD . /usr/src/app
 #   && chmod -R 775 public/uploaded
 
 # setting pm2 
-# RUN rm -rf node_modules \
-#   && mv /usr/src/node_modules /usr/src/app/ \
-#   && chmod -R 775 public/uploaded \
-#   && mkdir -p /.pm2 \
-#   && chown -R user:root /.pm2 \
-#   && chmod 775 /.pm2 
+RUN rm -rf node_modules \
+  && mv /usr/src/node_modules /usr/src/app/ \
+  && mkdir -p /.pm2 \
+  && chown -R user:root /.pm2 \
+  && chmod 775 /.pm2 
 
 # expose port
 EXPOSE 3000
