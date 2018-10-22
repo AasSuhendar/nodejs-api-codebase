@@ -1,9 +1,6 @@
-const auth = require('../helpers/auth')
 const Response = require('../helpers/response')
 const JWT = require('../helpers/jwt')
 const utils = require('../helpers/utils')
-const { validationResult } = require('express-validator/check');
-
 
 const User = require('../models/user')
 
@@ -56,6 +53,20 @@ const login = async (req, res) => {
     }
 }
 
+const validateToken = async (req, res) => {
+    try {
+        let token = utils.getToken(req.headers)
+
+        if (token) {
+            let decoded = await JWT.verifyToken(token)
+            Response.successResponse200(req, res, 'USERS-SERVICE', 'Token Valid', decoded)
+        }
+    } catch (error) {
+        res.send(error)
+    }
+}
+
 module.exports = {
-    login
+    login,
+    validateToken
 }

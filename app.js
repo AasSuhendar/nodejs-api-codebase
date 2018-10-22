@@ -15,6 +15,7 @@ const Response = require('./helpers/response')
 const indexRouter = require('./routes/index')
 const usersRouter = require('./routes/users')
 const authRouter = require('./routes/auth')
+const todosRouter = require('./routes/todos')
 
 const app = express();
 app.use(cors())
@@ -66,6 +67,7 @@ app.get('/users-services-swagger.json', function (req, res) {
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/api/auth', authRouter);
+app.use('/api/todos', todosRouter);
 app.use('/api/api-docs', swagger.swaggerUi.serve, swagger.swaggerUi.setup(swagger.swaggerSpec));
 
 // catch 404 and forward to error handler
