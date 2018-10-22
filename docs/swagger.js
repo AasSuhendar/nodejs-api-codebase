@@ -8,7 +8,7 @@ var swaggerDefinition = {
         version: '1.0.0',
         description: 'Users-Services describe with RESTful API with Swagger',
     },
-    host: 'localhost:3000',
+    host: env.swagger_host,
     basePath: '/',
 };
 
