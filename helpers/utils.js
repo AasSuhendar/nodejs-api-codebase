@@ -1,6 +1,7 @@
-var User = require('../models/user')
-var jwt = require('jsonwebtoken')
-var env = require('../configs/env')
+const User = require('../models/user')
+const jwt = require('jsonwebtoken')
+const env = require('../configs/env')
+const openshift = require('./openshift')
 const { validationResult } = require('express-validator/check');
 
 module.exports = {
@@ -46,6 +47,14 @@ module.exports = {
         if (!errors.isEmpty()) {
             // return res.status(422).json({ errors: errors.array() });
             return { errors: errors.array() }
+        }
+    },
+    getOpenshiftToken : async (email, password) => {
+        try {
+            const data = await openshift.authorizeOpenshiftToken(email, password)
+            return data
+        } catch (err) {
+            throw err
         }
     }
 }

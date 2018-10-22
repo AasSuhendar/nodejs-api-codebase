@@ -8,4 +8,8 @@ module.exports = {
     secret_key: process.env.SECRET_KEY,
     public_key: process.env.PUBLIC_KEY,
     private_key: process.env.PRIVATE_KEY,
+    private_key: process.env.PRIVATE_KEY,
+    URL_HOST: process.env.URL_HOST,
+    linkHostDomain: process.env.LINK_HOST_DOMAIN,
+    swagger_host: process.env.SWAGGER_HOST,
 }

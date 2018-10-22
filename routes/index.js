@@ -19,7 +19,7 @@ const router = express.Router();
  * /:
  *   get:
  *     tags:
- *       - Main Endpoint
+ *       - Main Endpoint Users-Service
  *     description: Returns info main endpoint status
  *     produces:
  *       - application/json
@@ -30,7 +30,7 @@ const router = express.Router();
  *           $ref: '#/definitions/MainEndPoint'
  */
 router.get('/', function (req, res, next) {
-  res.send({ status: true ,statusCode: 200, msg: 'Wellcome main endpoint API Users Service - Healty`' })
+  res.send({ status: true ,statusCode: 200, msg: 'Wellcome main endpoint API Users Service' })
 });
 
 /**

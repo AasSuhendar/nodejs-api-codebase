@@ -19,28 +19,44 @@ const login = async (req, res) => {
             } else {
                 user.comparePassword(password, async (err, isMatch) => {
                     if (isMatch && !err) {
-                        var userlogin = {
-                            _id: user.id,
-                            name: user.name,
-                            email: user.email,
-                            phone_number: user.phone_number,
-                            token: user.token,
-                            verified: user.verified,
-                            openshift: user.openshift,
-                            verified_aws: user.verified_aws,
-                            created_at: user.created_at,
-                            user_type: user.user_type,
-                            // openshift_data: openshiftData
-                        }
-                        let data = {
-                            email: user.email,
-                            name: user.name,
-                            token: user.token,
-                            openshift: user.openshift,
-                        }
+                        if (!user.verified) {
+                            Response.failedResponse403(req, res, 'USERS-SERVICE', 'Your account is not active. Please activate your account by clicking the link already sent to your email when registration.')
+                        } else {
+                            let openshiftData, statusOpenshift
+                            let result = await utils.getOpenshiftToken(email, password)
 
-                        let token = await JWT.generateToken({ exp: 3600, sub: userlogin })
-                        Response.successResponse200Login(req, res, 'USERS-SERVICE', 'Authentication Success.', data, token)
+                            if (result.success && result.status === 200) {
+                                openshiftData = result.data
+                                statusOpenshift = true
+                            } else {
+                                openshiftData = result.data
+                                statusOpenshift = false
+                            }
+                            
+                            var userlogin = {
+                                _id: user.id,
+                                name: user.name,
+                                email: user.email,
+                                phone_number: user.phone_number,
+                                token: user.token,
+                                verified: user.verified,
+                                openshift: user.openshift,
+                                verified_aws: user.verified_aws,
+                                created_at: user.created_at,
+                                user_type: user.user_type,
+                                openshift_data: openshiftData
+                            }
+                            let data = {
+                                email: user.email,
+                                name: user.name,
+                                token: user.token,
+                                openshift: user.openshift,
+                                active_openshift: statusOpenshift,
+                            }
+
+                            let token = await JWT.generateToken({ exp: 3600, sub: userlogin })
+                            Response.successResponse200Login(req, res, 'USERS-SERVICE', 'Authentication Success.', data, token)
+                        }
                     } else {
                         Response.failedResponse403(req, res, 'USERS-SERVICE', 'Authentication failed. Wrong password.')
                     }
