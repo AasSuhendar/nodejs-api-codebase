@@ -1,6 +1,7 @@
 require('dotenv').config()
 
 module.exports = {
+    apps_ports: process.env.APPS_PORT,
     database_prod: process.env.MONGO_URL_PROD,
     database_dev: process.env.MONGO_URL_DEV,
     database_test: process.env.MONGO_URL_TEST,

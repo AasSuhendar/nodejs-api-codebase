@@ -1,6 +1,7 @@
 var User = require('../models/user')
 var jwt = require('jsonwebtoken')
 var env = require('../configs/env')
+const { validationResult } = require('express-validator/check');
 
 module.exports = {
     getToken: function (headers) {
@@ -39,5 +40,12 @@ module.exports = {
             }
         })
         return data
+    },
+    validateResult: (req, res) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            // return res.status(422).json({ errors: errors.array() });
+            return { errors: errors.array() }
+        }
     }
 }
