@@ -21,7 +21,6 @@ module.exports = {
             var r = request.get(options, function () {
                 var hash = r.uri.href;
                 if (hash == null || hash == env.URL_HOST + 'oauth/authorize?response_type=token&client_id=openshift-challenging-client') {
-                    console.log("Error : user auth problem with basic auth cannot get token");
                     var data = {
                         success: false,
                         status: 403,

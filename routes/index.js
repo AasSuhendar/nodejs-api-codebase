@@ -38,13 +38,15 @@ router.get('/', function (req, res, next) {
  * /api/health/liveness:
  *   get:
  *     tags:
- *       - Health Liveness Probe
+ *       - Health Check
  *     description: Returns liveness status
  *     produces:
  *       - application/json
  *     responses:
  *       200:
- *         description: A return status liveness with status code 200
+ *         description: OK
+ *       503:
+ *         description: Service Unavailable
  */
 
 /**
@@ -52,13 +54,15 @@ router.get('/', function (req, res, next) {
  * /api/health/readiness:
  *   get:
  *     tags:
- *       - Health Readiness Probe
+ *       - Health Check
  *     description: Returns readiness status
  *     produces:
  *       - application/json
  *     responses:
  *       200:
- *         description: A return status liveness with status code 200
+ *         description: OK
+ *       503:
+ *         description: Service Unavailable
  */
 
 module.exports = router;

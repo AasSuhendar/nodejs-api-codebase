@@ -10,6 +10,19 @@ var swaggerDefinition = {
     },
     host: env.swagger_host,
     basePath: '/',
+    schemes:[
+        'http', 'https'
+    ],
+    tags:[
+        {
+            name : 'Auth',
+            description: 'Operation about authentication user'
+        },
+        {
+            name: 'Health Check',
+            description: 'Operation about for health check service'
+        }
+    ]
 };
 
 // options for the swagger docs

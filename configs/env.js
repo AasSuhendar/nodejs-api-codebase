@@ -12,4 +12,5 @@ module.exports = {
     URL_HOST: process.env.URL_HOST,
     linkHostDomain: process.env.LINK_HOST_DOMAIN,
     swagger_host: process.env.SWAGGER_HOST,
+    adminAccess: process.env.ADMIN_ACCESS,
 }
