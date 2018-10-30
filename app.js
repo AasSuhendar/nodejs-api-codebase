@@ -1,14 +1,13 @@
 const express = require('express')
 const cookieParser = require('cookie-parser');
 const logger = require('morgan')
-const mongoose = require('mongoose')
 const helmet = require('helmet')
 const cors = require('cors')
 const passport = require('passport')
 const expressValidator = require('express-validator')
 const probe = require('kube-probe')
 
-const env = require('./configs/env')
+const dbConnection = require('./database/mongoConnection')
 const swagger = require('./docs/swagger')
 const Response = require('./helpers/response')
 
@@ -26,37 +25,18 @@ probe(app);
 app.use(passport.initialize());
 require('./helpers/auth')
 
-mongoose.Promise = require('bluebird')
-if (process.env.NODE_ENV === 'test') {
-  mongoose.connect(env.database_test, {
-    useNewUrlParser: true,
-    useCreateIndex: true
-  })
-  mongoose.connection.on('connected', function () { })
-} else if (process.env.NODE_ENV === 'dev') {
-  mongoose.connect(env.database_dev, {
-    useNewUrlParser: true,
-    useCreateIndex: true
-  })
-  mongoose.connection.on('connected', function () {
-    console.log('Mongoose default connection open to (dev) :' + env.database_dev)
-  })
+if (process.env.NODE_ENV === 'dev') {
   app.use(logger('dev'))
-} else if (process.env.NODE_ENV === 'prod') {
-  mongoose.connect(env.database_prod, {
-    useNewUrlParser: true,
-    useCreateIndex: true
-  })
-  mongoose.connection.on('connected', function () { })
+} else {
   app.use(logger('combined'))
   app.use(helmet())
 }
 
+dbConnection.createMongoConnection()
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-
 
 // serve swagger
 app.get('/users-services-swagger.json', function (req, res) {
