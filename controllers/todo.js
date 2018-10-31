@@ -1,10 +1,21 @@
 const Response = require('../helpers/response')
-const JWT = require('../helpers/jwt')
-const utils = require('../helpers/utils')
-
 const Todo = require('../models/todo')
 
 const getListTodo = async (req, res) => {
+    // let todo = {
+    //     "status": "Doing",
+    //     "name": "Todo 1",
+    //     "description": "Description to do 1",
+    // }
+    // let TodoNew = new Todo(todo)
+    // TodoNew.save(err => {
+    //     if (err) {
+    //         console.log(err);
+    //     }else{
+    //         console.log('Saved');
+    //     }
+    // })
+
     let listTodo = await Todo.find({})
     console.log(listTodo);
     

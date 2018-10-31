@@ -2,8 +2,12 @@
   "name": "users-service",
   "version": "0.0.0",
   "private": true,
+  "jest": {
+    "testRegex": "(/tests/.*|(\\.|/)(test|spec))\\.js?$"
+  },
   "scripts": {
-    "start": "node ./bin/www"
+    "start": "node ./bin/www",
+    "test": "jest --coverage"
   },
   "dependencies": {
     "axios": "^0.18.0",
@@ -28,8 +32,13 @@
     "passport-jwt": "^4.0.0",
     "passport-local": "^1.0.0",
     "request": "^2.88.0",
+    "sinon": "^7.1.0",
     "swagger-jsdoc": "^3.2.3",
     "swagger-ui-express": "^4.0.1",
     "uuid": "^3.3.2"
+  },
+  "devDependencies": {
+    "cypress": "^3.1.0",
+    "jest": "^23.6.0"
   }
 }

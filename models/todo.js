@@ -20,4 +20,4 @@ var ToDoSchema = new Schema({
     }
 })
 
-module.exports = mongoose.model('Sample_todo', ToDoSchema)
+module.exports = mongoose.model('sample_todo', ToDoSchema)
