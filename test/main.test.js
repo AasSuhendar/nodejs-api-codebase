@@ -3,12 +3,12 @@ const main = require('../controllers/index');
 const sinon = require('sinon');
 const request = require('request');
 var chai = require('chai');
-var spies = require('chai-spies');
-var chaiHttp = require('chai-http');
+// var spies = require('chai-spies');
+// var chaiHttp = require('chai-http');
 var expect = chai.expect
 
-chai.use(spies);
-chai.use(chaiHttp);
+// chai.use(spies);
+// chai.use(chaiHttp);
 
 const Todo = require('../models/todo')
 let baseurl = 'http://localhost:3000'
