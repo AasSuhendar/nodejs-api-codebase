@@ -30,7 +30,7 @@ const router = express.Router();
  *           $ref: '#/definitions/MainEndPoint'
  */
 router.get('/', function (req, res, next) {
-  res.send({ status: true ,statusCode: 200, msg: 'Wellcome main endpoint API Users Service' })
+  
 });
 
 /**

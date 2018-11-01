@@ -26,6 +26,19 @@ const getListTodo = async (req, res) => {
     }
 }
 
+const getListTodos = async (req, res) => {
+
+    let listTodo = await Todo.find({})
+    console.log(listTodo);
+    res.send(listTodo)
+    // if (!listTodo) {
+    //     Response.failedResponse403(req, res, 'TODOS-SERVICE', 'List Todos not found.')
+    // } else {
+    //     Response.successResponse200(req, res, 'TODOS-SERVICE', 'Get List Todos Success.', listTodo)
+    // }
+}
+
 module.exports = {
-    getListTodo
+    getListTodo,
+    getListTodos
 }

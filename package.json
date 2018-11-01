@@ -3,11 +3,11 @@
   "version": "0.0.0",
   "private": true,
   "jest": {
-    "testRegex": "(/tests/.*|(\\.|/)(test|spec))\\.js?$"
+    "testRegex": "(/test/.*|(\\.|/)(test|spec))\\.js?$"
   },
   "scripts": {
     "start": "node ./bin/www",
-    "test": "jest --coverage"
+    "test": "nyc mocha --recursive --reporter mocha-junit-reporter"
   },
   "dependencies": {
     "axios": "^0.18.0",
@@ -38,7 +38,13 @@
     "uuid": "^3.3.2"
   },
   "devDependencies": {
+    "chai": "^4.2.0",
+    "chai-http": "^4.2.0",
+    "chai-spies": "^1.0.0",
     "cypress": "^3.1.0",
-    "jest": "^23.6.0"
+    "jest": "^23.6.0",
+    "mocha": "^5.2.0",
+    "mocha-junit-reporter": "^1.18.0",
+    "nyc": "^13.1.0"
   }
 }
