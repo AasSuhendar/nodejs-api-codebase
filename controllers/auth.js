@@ -144,18 +144,17 @@ const validateToken = async (req, res) => {
 }
 
 const verifi = async (req, res) => {
-    let mail = await axios.post('http://localhost:3003/api/mailer/send-verification', {
+    await axios.post('http://localhost:3003/api/mailer/send-verification', {
         name: 'aas',
         email: 'aas.suhendar@gmail.com',
         token: 'sahdajd98a09s8ds0a',
     })
-        .then(res => {
-            console.log(res);
-            res.send(res)
+        .then(resp => {
+            console.log(resp);
+            res.send(resp)
         }).catch(err => {
             console.log(err);
         })
-    // console.log(mail)
 }
 
 module.exports = {
