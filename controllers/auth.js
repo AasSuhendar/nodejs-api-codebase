@@ -1,6 +1,7 @@
 const Response = require('../helpers/response')
 const JWT = require('../helpers/jwt')
 const utils = require('../helpers/utils')
+const auth = require('../helpers/auth')
 const env = require('../configs/env')
 const axios = require('axios')
 
@@ -11,8 +12,9 @@ const login = async (req, res) => {
     if (errorValidate) {
         Response.failedResponse400(req, res, 'USERS-SERVICE', 'Error in validation input data', errorValidate)
     } else {
+        let { role } = req.params
         let { email, password } = req.body
-
+        
         try {
             let user = await User.findOne({ email: email })
 
@@ -24,101 +26,27 @@ const login = async (req, res) => {
                         if (!user.verified) {
                             Response.failedResponse403(req, res, 'USERS-SERVICE', 'Your account is not active. Please activate your account by clicking the link already sent to your email when registration.')
                         } else {
-                            let openshiftData, statusOpenshift
-                            let result = await utils.getOpenshiftToken(email, password)
-
-                            if (result.success && result.status === 200) {
-                                openshiftData = result.data
-                                statusOpenshift = true
-                            } else {
-                                openshiftData = result.data
-                                statusOpenshift = false
-                            }
-
-                            var userlogin = {
-                                _id: user.id,
-                                name: user.name,
-                                email: user.email,
-                                phone_number: user.phone_number,
-                                token: user.token,
-                                verified: user.verified,
-                                openshift: user.openshift,
-                                verified_aws: user.verified_aws,
-                                created_at: user.created_at,
-                                user_type: user.user_type,
-                                openshift_data: openshiftData
-                            }
+                            
                             let data = {
                                 email: user.email,
                                 name: user.name,
                                 token: user.token,
                                 openshift: user.openshift,
-                                active_openshift: statusOpenshift,
                             }
 
+                            let userlogin = await auth.setPayload(role, user, email, password)
                             let token = await JWT.generateToken({ exp: 3600, sub: userlogin })
-                            Response.successResponse200Login(req, res, 'USERS-SERVICE', 'Authentication Success.', data, token)
-                        }
-                    } else {
-                        Response.failedResponse403(req, res, 'USERS-SERVICE', 'Authentication failed. Wrong password.')
-                    }
-                })
-            }
-        } catch (error) {
-            return res.status(500).send(error)
-        }
-    }
-}
 
-const adminLogin = async (req, res) => {
-    let errorValidate = utils.validateResult(req, res)
-    if (errorValidate) {
-        Response.failedResponse400(req, res, 'USERS-SERVICE', 'Error in validation input data', errorValidate)
-    } else {
-        try {
-            let { email, password } = req.body
-            let user = await User.findOne({ email: email })
-            if (!user) {
-                Response.failedResponse403(req, res, 'USERS-SERVICE', 'Authentication failed. User not found.')
-            } else {
-                user.comparePassword(password, async (err, isMatch) => {
-                    if (!err && isMatch) {
-                        if (user.verified && env.adminAccess.includes(email)) {
-                            let openshiftData, statusOpenshift
-                            let result = await utils.getOpenshiftToken(email, password)
-
-                            if (result.success && result.status === 200) {
-                                openshiftData = result.data
-                                statusOpenshift = true
+                            if (role == "admin" && env.adminAccess.includes(email)) {
+                                data.admin = true
+                                data.active_openshift = userlogin.openshift_status
+                                Response.successResponse200Login(req, res, 'USERS-SERVICE', 'Authentication Success.', data, token)
+                            } else if ((role != "admin" && !env.adminAccess.includes(email)) || role != "admin") {
+                                data.active_openshift = userlogin.openshift_status
+                                Response.successResponse200Login(req, res, 'USERS-SERVICE', 'Authentication Success.', data, token)
                             } else {
-                                openshiftData = result.data
-                                statusOpenshift = false
+                                Response.failedResponse403(req, res, 'USERS-SERVICE', 'Unauthorized for login as Admin.')
                             }
-
-                            var userlogin = {
-                                _id: user.id,
-                                name: user.name,
-                                email: user.email,
-                                phone_number: user.phone_number,
-                                token: user.token,
-                                verified: user.verified,
-                                openshift: user.openshift,
-                                verified_aws: user.verified_aws,
-                                created_at: user.created_at,
-                                user_type: user.user_type,
-                                openshift_data: openshiftData
-                            }
-                            let data = {
-                                email: user.email,
-                                name: user.name,
-                                token: user.token,
-                                admin: true,
-                                openshift: user.openshift,
-                                active_openshift: statusOpenshift,
-                            }
-
-                            let token = await JWT.generateToken({ exp: 3600, sub: userlogin })
-                            Response.successResponse200Login(req, res, 'USERS-SERVICE', 'Authentication Success.', data, token)
                         }
                     } else {
                         Response.failedResponse403(req, res, 'USERS-SERVICE', 'Authentication failed. Wrong password.')
@@ -159,7 +87,6 @@ const verifi = async (req, res) => {
 
 module.exports = {
     login,
-    adminLogin,
     validateToken,
     verifi
 }

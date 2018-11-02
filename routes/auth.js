@@ -113,7 +113,7 @@ router.post('/private-basic', auth.AuthenticatedBasic,
  *     parameters:
  *       - in: body
  *         name: user
- *         description: Login user
+ *         description: Parameter input POST for login by User
  *         schema:
  *           type: object
  *           required:
@@ -142,7 +142,7 @@ router.post('/login', [
 
 /**
  * @swagger
- * /api/auth/login-admin:
+ * /api/auth/login/{role}:
  *   post:
  *     tags:
  *       - Auth
@@ -150,9 +150,13 @@ router.post('/login', [
  *     consumes:
  *       - application/json
  *     parameters:
+ *       - in: path
+ *         name: role
+ *         type: string
+ *         description: Parameter in Path in url for login by Admin
  *       - in: body
  *         name: user
- *         description: Login admin
+ *         description: Parameter input POST for login by Admin
  *         schema:
  *           type: object
  *           required:
@@ -174,10 +178,10 @@ router.post('/login', [
  *           $ref: '#/definitions/Failed403'
  *         
  */
-router.post('/login-admin', [
+router.post('/login/:role', [
     body('email').isEmail(),
     body('password').not().isEmpty().trim().escape()
-], AuthController.adminLogin)
+], AuthController.login)
 /**
  * @swagger
  * /api/auth/validate-token:

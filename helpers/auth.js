@@ -5,7 +5,7 @@ const passport = require('passport');
 
 const User = require('../models/user'); // load up the user model
 const config = require('../configs/env'); // get db config file
-
+const utils = require('./utils')
 
 let opts = {};
 // opts.jwtFromRequest = ExtractJwt.fromAuthHeaderWithScheme('jwt')
@@ -13,7 +13,7 @@ opts.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken()
 opts.secretOrKey = config.secret_key;
 
 passport.use(new JwtStrategy(opts, function (jwt_payload, done) {
-    
+
     User.findOne({
         email: jwt_payload.sub.email
     }, function (err, user) {
@@ -44,7 +44,7 @@ passport.use(new BasicStrategy(
                 return done(null, false);
             }
             console.log(user);
-            
+
             user.comparePassword(password, function (err, isMatch) {
                 if (isMatch && !err) {
                     // if user is found and password is right create a token
@@ -67,7 +67,40 @@ passport.use(new BasicStrategy(
     }
 ));
 
+const setPayload = async (role, user, email, password) => {
+    let openshiftData, statusOpenshift
+    let result = await utils.getOpenshiftToken(email, password)
+    
+
+    if (result.success && result.status === 200) {
+        openshiftData = result.data
+        statusOpenshift = true
+    } else {
+        openshiftData = result.data
+        statusOpenshift = false
+    }
+
+    return userlogin = {
+        _id: user.id,
+        name: user.name,
+        email: user.email,
+        phone_number: user.phone_number,
+        token: user.token,
+        verified: user.verified,
+        openshift: user.openshift,
+        verified_aws: user.verified_aws,
+        created_at: user.created_at,
+        user_type: user.user_type,
+        openshift_status:statusOpenshift,
+        openshift_data: openshiftData,
+        
+    }
+    
+    
+}
+
 module.exports = {
     AuthenticatedJWT: passport.authenticate(['jwt'], { session: false }),
-    AuthenticatedBasic: passport.authenticate(['basic'], { session: false })
+    AuthenticatedBasic: passport.authenticate(['basic'], { session: false }),
+    setPayload
 }
