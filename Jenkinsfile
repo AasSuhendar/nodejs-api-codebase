@@ -33,7 +33,7 @@ node() {
         stage('Testing'){
             echo 'Testing...'
             sh 'npm test'
-	        // sh 'npm run bdd'
+	        sh 'npm run coverage'
         }
 	
     }finally{

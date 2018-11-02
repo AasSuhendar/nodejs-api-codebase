@@ -7,7 +7,8 @@
   },
   "scripts": {
     "start": "node ./bin/www",
-    "test": "nyc --reporter=text --reporter=html mocha --recursive --reporter mocha-junit-reporter"
+    "test": "nyc mocha --recursive --reporter mocha-junit-reporter",
+    "coverage": "nyc report --reporter=lcov --reporter=text-lcov"
   },
   "dependencies": {
     "axios": "^0.18.0",
