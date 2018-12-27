@@ -15,6 +15,7 @@ pipeline {
         SECRET_KEY = 'secret'
         DB_TYPE = 'mongo'
         MONGO_URL_TEST  = "${params.DB_TEST_URL}"
+        MYSQL_URL_TEST  = "${params.DB_TEST_URL}"
     }
 
     agent any
@@ -41,6 +42,7 @@ pipeline {
                     echo "get COMMIT_ID"
                     sh 'echo -n $(git rev-parse --short HEAD) > ./commit-id'
                     commitId = readFile('./commit-id')    
+                    sh 'printenv'
                 }
                 stash(name: 'ws', includes:'**,./commit-id')
             }
