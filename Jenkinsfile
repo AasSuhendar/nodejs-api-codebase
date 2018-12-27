@@ -1,4 +1,4 @@
-ipipeline {
+pipeline {
 
     parameters {
         string(name: 'KUBE_DEV_NAMESPACE',         description: 'Kubernetes Development Namespace',                  defaultValue: 'playcourt')
