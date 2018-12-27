@@ -1,18 +1,16 @@
 const todo = require('../../controllers/todo')
 const Todo = require('../../models/todo')
 const sinon = require('sinon')
-var chai = require('chai')
-var expect = chai.expect
 
-var assert = require('assert');
-describe('Controllers Index', function () {
+describe('Controllers Todo', function () {
     describe('Todo controller route /', function () {
 
         let TestTodo
         beforeEach(function () {
             res = {
-                json: sinon.spy(),
-                status: sinon.stub().returns({ send: sinon.spy() })
+                status: sinon.stub().returns({
+                    json: sinon.spy()
+                })
             };
             req = {}
             TestTodo = sinon.stub(Todo, 'find')
@@ -24,8 +22,8 @@ describe('Controllers Index', function () {
 
 
         it('should return json Todo', function () {
-            listTodo = [
-                {
+            expectedResult = [{}, {}, {}]
+            listTodo = [{
                     "status": "To Do",
                     "_id": "5bd930c76044c90815d5a5c1",
                     "name": "Todo 2",
@@ -42,22 +40,16 @@ describe('Controllers Index', function () {
                     "__v": 0
                 }
             ]
-
             TestTodo.returns(listTodo)
-            todo.getListTodo(req, res)
-
-            // sinon.assert.calledWith(Todo.find, {})
-            // sinon.assert.calledWith(res.json, sinon.match.array);
+            todo.getListTodoMongo(req, res)
+            sinon.assert.calledWith(TestTodo, {})
         });
 
         it('should not return json Todo', function () {
             listTodo = null
-
             TestTodo.returns(listTodo)
-            todo.getListTodo(req, res)
-
-            // sinon.assert.calledWith(Todo.find, {})
-            // sinon.assert.calledWith(res.json, sinon.match.array);
+            todo.getListTodoMongo(req, res)
+            sinon.assert.calledWith(TestTodo, {})
         });
     });
 });
