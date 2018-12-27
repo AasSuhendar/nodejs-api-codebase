@@ -72,7 +72,6 @@ const delTodoMongo = async (req, res) => {
 
 const getListTodoSQL = async (req, res) => {
     TodoSQL.findAll({}).then(todos => {
-        todos = null
         if (!todos) {
             Response.failedResponse(req, res, 404, 'TODOS-SERVICE', 'List Todos not found.')
         } else {
