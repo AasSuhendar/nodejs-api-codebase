@@ -15,7 +15,7 @@ pipeline {
         SECRET_KEY = 'secret'
         DB_TYPE = 'mongo'
         MONGO_URL_TEST  = "${params.DB_TEST_URL}"
-        MYSQL_URL_TEST  = "${params.DB_TEST_URL}"
+        MYSQL_URL_TEST  = 'mysql://root:qwerty445@localhost:3306/node-complete'
     }
 
     agent any
@@ -92,12 +92,12 @@ pipeline {
         }
 
         stage('SonarQube Scan') {
-            // when {
-            //     anyOf {
-            //         branch 'master'
-            //         branch 'develop'
-            //     }
-            // }
+            when {
+                anyOf {
+                    branch 'master'
+                    branch 'development'
+                }
+            }
             agent { label "agent-node-go" }
             steps {
                 unstash 'ws'
