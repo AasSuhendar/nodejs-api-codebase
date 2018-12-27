@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const IndexController = require('../controllers/index')
 
 /**
  * @swagger
@@ -29,9 +30,7 @@ const router = express.Router();
  *         schema:
  *           $ref: '#/definitions/MainEndPoint'
  */
-router.get('/', function (req, res, next) {
-  res.send({ status: true ,statusCode: 200, msg: 'Wellcome main endpoint API Users Service' })
-});
+router.get('/', IndexController.getIndex);
 
 /**
  * @swagger

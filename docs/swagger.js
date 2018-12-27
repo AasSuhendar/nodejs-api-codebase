@@ -10,17 +10,20 @@ var swaggerDefinition = {
     },
     host: env.swagger_host,
     basePath: '/',
-    schemes:[
+    schemes: [
         'http', 'https'
     ],
-    tags:[
-        {
-            name : 'Auth',
+    tags: [{
+            name: 'Auth',
             description: 'Operation about authentication user'
         },
         {
             name: 'Health Check',
             description: 'Operation about for health check service'
+        },
+        {
+            name: 'Todos',
+            description: 'Operation about todo service'
         }
     ]
 };

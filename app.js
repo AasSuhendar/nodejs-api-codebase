@@ -7,12 +7,10 @@ const passport = require('passport')
 const expressValidator = require('express-validator')
 const probe = require('kube-probe')
 
-const dbConnection = require('./database/mongoConnection')
 const swagger = require('./docs/swagger')
 const Response = require('./helpers/response')
 
 const indexRouter = require('./routes/index')
-const usersRouter = require('./routes/users')
 const authRouter = require('./routes/auth')
 const todosRouter = require('./routes/todos')
 
@@ -32,10 +30,18 @@ if (process.env.NODE_ENV === 'dev') {
   app.use(helmet())
 }
 
-dbConnection.createMongoConnection()
+if (process.env.DB_TYPE == 'mysql') {
+  const dbConnection = require('./database/mysqlConnection').sequelizeCreateConnection
+  require('./database/mysqlConnection').initialDB(dbConnection)
+} else {
+  const dbConnection = require('./database/mongoConnection')
+  dbConnection.createMongoConnection()
+}
 
 app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+app.use(express.urlencoded({
+  extended: false
+}));
 app.use(cookieParser());
 
 // serve swagger
@@ -45,19 +51,18 @@ app.get('/users-services-swagger.json', function (req, res) {
 });
 
 app.use('/', indexRouter);
-app.use('/users', usersRouter);
 app.use('/api/auth', authRouter);
 app.use('/api/todos', todosRouter);
 app.use('/api/api-docs', swagger.swaggerUi.serve, swagger.swaggerUi.setup(swagger.swaggerSpec));
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
-  Response.failedResponse404(req, res, 'NOT-FOUND', 'Service not found')
+  Response.failedResponse(req, res, 404, 'NOT-FOUND', 'Service not found')
 })
 
 // error handler
 app.use(function (err, req, res) {
-  Response.failedResponse500(req, res, 'ERROR-SERVICES', 'Server Error', err.message)
+  Response.failedResponse(req, res, 500, 'ERROR-SERVICES', 'Server Error', err.message)
 })
 
 module.exports = app;

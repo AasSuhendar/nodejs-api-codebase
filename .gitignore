@@ -12,7 +12,8 @@ lib-cov
 
 # Coverage directory used by tools like istanbul
 coverage
-
+cypress
+.nyc_output
 # Grunt intermediate storage (http://gruntjs.com/creating-plugins#storing-task-files)
 .grunt
 
@@ -29,6 +30,7 @@ node_modules
 # Debug log from npm
 npm-debug.log
 
+cypress.json
 cucumber.js
 junit.xml
 test-results.xml
