@@ -7,7 +7,7 @@ passport.use(new BasicStrategy(
     async function (user, password, done) {
 
         if (user == 'user' && password == 'password') {
-            userPayload = {
+            let userPayload = {
                 email: 'user',
             }
             let token = await JWT.generateToken({
