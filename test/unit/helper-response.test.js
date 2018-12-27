@@ -3,6 +3,8 @@ const sinon = require('sinon')
 var chai = require('chai')
 var expect = chai.expect
 
+process.env.NODE_ENV = 'test'
+
 describe('Helpers', function () {
     describe('Response Helpers', function () {
         it('should return json message successResponse', function () {

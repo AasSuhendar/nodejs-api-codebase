@@ -3,6 +3,8 @@ const sinon = require('sinon')
 var chai = require('chai')
 var expect = chai.expect
 
+process.env.NODE_ENV = 'test'
+
 describe('Controllers Index', function () {
     describe('Main controller route /', function () {
         it('should return json message', function () {

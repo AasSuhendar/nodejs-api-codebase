@@ -86,6 +86,7 @@ pipeline {
     
                     echo "Run Unit Test"
                     sh "npm test"
+                    sh "npm run coverage"
                 }
             }    
         }
