@@ -2,6 +2,8 @@ const todo = require('../../controllers/todo')
 const Todo = require('../../models/todo')
 const sinon = require('sinon')
 
+process.env.NODE_ENV = 'test'
+
 describe('Controllers Todo', function () {
     describe('Todo controller route /', function () {
 
