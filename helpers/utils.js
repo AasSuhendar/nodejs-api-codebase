@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken')
 const env = require('../configs/env')
 const {
     validationResult
-} = require('express-validator/check');
+} = require('express-validator/check')
 
 module.exports = {
     getToken: function (headers) {
@@ -17,12 +17,12 @@ module.exports = {
             return null
         }
     },
-    verifyToken: async function (token) {
+    verifyToken: async function (token, res) {
         if (!token)
             return res.status(403).send({
                 auth: false,
                 message: 'No token provided.'
-            });
+            })
 
         var data = await jwt.verify(token, env.secret, function (err, decoded) {
             if (err) {
@@ -38,8 +38,8 @@ module.exports = {
         })
         return data
     },
-    validateResult: (req, res) => {
-        const errors = validationResult(req);
+    validateResult: (req) => {
+        const errors = validationResult(req)
         if (!errors.isEmpty()) {
             // return res.status(422).json({ errors: errors.array() });
             return {

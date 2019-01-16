@@ -14,19 +14,19 @@ var swaggerDefinition = {
         'http', 'https'
     ],
     tags: [{
-            name: 'Auth',
-            description: 'Operation about authentication user'
-        },
-        {
-            name: 'Health Check',
-            description: 'Operation about for health check service'
-        },
-        {
-            name: 'Todos',
-            description: 'Operation about todo service'
-        }
+        name: 'Auth',
+        description: 'Operation about authentication user'
+    },
+    {
+        name: 'Health Check',
+        description: 'Operation about for health check service'
+    },
+    {
+        name: 'Todos',
+        description: 'Operation about todo service'
+    }
     ]
-};
+}
 
 // options for the swagger docs
 var options = {
@@ -34,10 +34,10 @@ var options = {
     swaggerDefinition: swaggerDefinition,
     // path to the API docs
     apis: ['./routes/*.js'],
-};
+}
 
 // initialize swagger-jsdoc
-var swaggerSpec = swaggerJSDoc(options);
+var swaggerSpec = swaggerJSDoc(options)
 
 module.exports = {
     swaggerUi,

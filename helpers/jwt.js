@@ -1,9 +1,9 @@
-const env = require('../configs/env');
-const uuid = require('uuid/v4');
-const jwt = require('jsonwebtoken');
+const env = require('../configs/env')
+const uuid = require('uuid/v4')
+const jwt = require('jsonwebtoken')
 
-const private_key = env.private_key
-const public_key = env.public_key
+// const private_key = env.private_key
+// const public_key = env.public_key
 
 const generateToken = async ({ exp = 3600, sub = '' } = {}) => {
     

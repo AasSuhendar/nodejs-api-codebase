@@ -5,9 +5,9 @@ const TodoSQL = require('../models/todo-sql')
 const getListTodoMongo = async (req, res) => {
     let listTodo = await Todo.find({})
     if (!listTodo) {
-        Response.failedResponse(req, res, 400, 'TODOS-SERVICE', 'List Todos not found.')
+        Response.failedResponse(res, 400, 'TODOS-SERVICE', 'List Todos not found.')
     } else {
-        Response.successResponse(req, res, 200, 'TODOS-SERVICE', 'Get List Todos Success.', listTodo)
+        Response.successResponse(res, 200, 'TODOS-SERVICE', 'Get List Todos Success.', listTodo)
     }
 }
 
@@ -16,9 +16,9 @@ const getTodoMongo = async (req, res) => {
         _id: req.params.id
     })
     if (!aTodo) {
-        Response.failedResponse(req, res, 400, 'TODOS-SERVICE', 'List Todos not found.')
+        Response.failedResponse(res, 400, 'TODOS-SERVICE', 'List Todos not found.')
     } else {
-        Response.successResponse(req, res, 200, 'TODOS-SERVICE', 'Get List Todos Success.', aTodo)
+        Response.successResponse(res, 200, 'TODOS-SERVICE', 'Get List Todos Success.', aTodo)
     }
 }
 
@@ -31,16 +31,14 @@ const postTodoMongo = async (req, res) => {
     var newTodo = new Todo(todoitem)
     newTodo.save((err, todo) => {
         if (err) {
-            Response.failedResponse(req, res, 400, 'TODO-SERVICE', 'Post Todos Failed', err)
+            Response.failedResponse(res, 400, 'TODO-SERVICE', 'Post Todos Failed', err)
         } else {
-            Response.successResponse(req, res, 201, 'TODO-SERVICE', 'Post Todos Success', todo)
+            Response.successResponse(res, 201, 'TODO-SERVICE', 'Post Todos Success', todo)
         }
     })
 }
 
 const putTodoMongo = async (req, res) => {
-    console.log(req.params.id);
-
     Todo.findByIdAndUpdate({
         _id: req.params.id
     }, {
@@ -53,9 +51,9 @@ const putTodoMongo = async (req, res) => {
         new: true
     }, (err, todo) => {
         if (err) {
-            Response.failedResponse(req, res, 400, 'TODO-SERVICE', 'Update Todos Failed', err)
+            Response.failedResponse(res, 400, 'TODO-SERVICE', 'Update Todos Failed', err)
         } else {
-            Response.successResponse(req, res, 200, 'TODO-SERVICE', 'Update Todos Success', todo)
+            Response.successResponse(res, 200, 'TODO-SERVICE', 'Update Todos Success', todo)
         }
     })
 }
@@ -63,9 +61,9 @@ const putTodoMongo = async (req, res) => {
 const delTodoMongo = async (req, res) => {
     Todo.findOneAndDelete(req.params.id, (err, todo) => {
         if (err) {
-            Response.failedResponse(req, res, 400, 'TODO-SERVICE', 'Update Todos Failed', err)
+            Response.failedResponse(res, 400, 'TODO-SERVICE', 'Update Todos Failed', err)
         } else {
-            Response.successResponse(req, res, 200, 'TODO-SERVICE', 'Update Todos Success', todo)
+            Response.successResponse(res, 200, 'TODO-SERVICE', 'Update Todos Success', todo)
         }
     })
 }
@@ -73,21 +71,21 @@ const delTodoMongo = async (req, res) => {
 const getListTodoSQL = async (req, res) => {
     TodoSQL.findAll({}).then(todos => {
         if (!todos) {
-            Response.failedResponse(req, res, 404, 'TODOS-SERVICE', 'List Todos not found.')
+            Response.failedResponse(res, 404, 'TODOS-SERVICE', 'List Todos not found.')
         } else {
-            Response.successResponse(req, res, 200, 'TODO-SERVICE', 'Get List Todos Success', todos)
+            Response.successResponse(res, 200, 'TODO-SERVICE', 'Get List Todos Success', todos)
         }
-    }).catch(err => Response.failedResponse(req, res, 500, 'TODO-SERVICE', 'Error Occurred', error))
+    }).catch(err => Response.failedResponse(res, 500, 'TODO-SERVICE', 'Error Occurred', err))
 }
 
 const getTodoSQL = async (req, res) => {
     TodoSQL.findByPk(req.params.id).then(todos => {
         if (!todos) {
-            Response.failedResponse(req, res, 404, 'TODOS-SERVICE', 'List Todos not found.')
+            Response.failedResponse(res, 404, 'TODOS-SERVICE', 'List Todos not found.')
         } else {
-            Response.successResponse(req, res, 200, 'TODO-SERVICE', 'Get List Todos Success', todos)
+            Response.successResponse(res, 200, 'TODO-SERVICE', 'Get List Todos Success', todos)
         }
-    }).catch(err => Response.failedResponse(req, res, 500, 'TODO-SERVICE', 'Error Occurred', error))
+    }).catch(err => Response.failedResponse(res, 500, 'TODO-SERVICE', 'Error Occurred', err))
 }
 
 const postTodoSQL = async (req, res) => {
@@ -102,9 +100,9 @@ const postTodoSQL = async (req, res) => {
         description: description,
         status: status,
     }).then(todo => {
-        Response.successResponse(req, res, 201, 'TODO-SERVICE', 'Post Todos Success', todo)
+        Response.successResponse(res, 201, 'TODO-SERVICE', 'Post Todos Success', todo)
     }).catch(err => {
-        Response.failedResponse(req, res, 400, 'TODO-SERVICE', 'Post Todos Failed', err)
+        Response.failedResponse(res, 400, 'TODO-SERVICE', 'Post Todos Failed', err)
     })
 }
 
@@ -113,18 +111,18 @@ const putTodoSQL = async (req, res) => {
     try {
         let todo = await TodoSQL.findByPk(req.params.id)
         if (!todo) {
-            Response.failedResponse404(req, res, 'TODOS-SERVICE', 'List Todos not found.')
+            Response.failedResponse404(res, 'TODOS-SERVICE', 'List Todos not found.')
         } else {
             todo.update(req.body, {
-                    where: {
-                        id: id
-                    }
-                })
-                .then(rowsUpdated => Response.successResponse(req, res, 202, 'TODO-SERVICE', 'Update Todos Success', rowsUpdated))
-                .catch(err => Response.failedResponse(req, res, 500, 'TODO-SERVICE', 'Delete Todos Failed', err))
+                where: {
+                    id: id
+                }
+            })
+                .then(rowsUpdated => Response.successResponse(res, 202, 'TODO-SERVICE', 'Update Todos Success', rowsUpdated))
+                .catch(err => Response.failedResponse(res, 500, 'TODO-SERVICE', 'Delete Todos Failed', err))
         }
     } catch (error) {
-        Response.failedResponse(req, res, 500, 'TODO-SERVICE', 'Error Occurred', error)
+        Response.failedResponse(res, 500, 'TODO-SERVICE', 'Error Occurred', error)
     }
 }
 
@@ -132,14 +130,14 @@ const delTodoSQL = async (req, res) => {
     try {
         let todo = await TodoSQL.findByPk(req.params.id)
         if (!todo) {
-            Response.failedResponse(req, res, 404, 'TODOS-SERVICE', 'List Todos not found.')
+            Response.failedResponse(res, 404, 'TODOS-SERVICE', 'List Todos not found.')
         } else {
             todo.destroy().then(result => {
-                Response.successResponse(req, res, 200, 'TODO-SERVICE', 'Delete Todos Success', result)
-            }).catch(err => Response.failedResponse(req, res, 400, 'TODO-SERVICE', 'Delete Todos Failed', err))
+                Response.successResponse(res, 200, 'TODO-SERVICE', 'Delete Todos Success', result)
+            }).catch(err => Response.failedResponse(res, 400, 'TODO-SERVICE', 'Delete Todos Failed', err))
         }
     } catch (error) {
-        Response.failedResponse(req, res, 500, 'TODO-SERVICE', 'Error Occurred', error)
+        Response.failedResponse(res, 500, 'TODO-SERVICE', 'Error Occurred', error)
     }
 }
 

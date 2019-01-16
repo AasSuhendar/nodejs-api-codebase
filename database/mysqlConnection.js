@@ -1,14 +1,14 @@
-const env = require('../configs/env');
-const DSNParser = require('dsn-parser');
+const env = require('../configs/env')
+const DSNParser = require('dsn-parser')
 const Sequelize = require('sequelize')
 
 const connType = () => {
     if (process.env.NODE_ENV === 'test') {
-        return new DSNParser(env.database_mysql_test).getParts();
+        return new DSNParser(env.database_mysql_test).getParts()
     } else if (process.env.NODE_ENV === 'dev') {
-        return new DSNParser(env.database_mysql_dev).getParts();
+        return new DSNParser(env.database_mysql_dev).getParts()
     } else if (process.env.NODE_ENV === 'prod') {
-        return new DSNParser(env.database_mysql_prod).getParts();
+        return new DSNParser(env.database_mysql_prod).getParts()
     }
 }
 
@@ -29,17 +29,17 @@ const sequelizeCreateConnection = new Sequelize(connType().database, connType().
 const initialDB = (sequelize) => {
     sequelize
         .authenticate()
-        .then(function (err) {
-            console.log('Connection has been established successfully.');
+        .then(function () {
+            console.log('Connection has been established successfully.')
         }, function (err) {
-            console.log('Unable to connect to the database:', err);
-        });
+            console.log('Unable to connect to the database:', err)
+        })
 
     sequelize.sync({
-            // force: true
-        })
+        // force: true
+    })
         .then(() => {
-            console.log(`Database & tables created!`)
+            console.log('Database & tables created!')
         })
 
     return sequelize
@@ -48,4 +48,4 @@ const initialDB = (sequelize) => {
 module.exports = {
     sequelizeCreateConnection,
     initialDB
-};
+}

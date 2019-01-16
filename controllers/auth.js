@@ -6,8 +6,8 @@ const validateToken = async (req, res) => {
     try {
         let token = utils.getToken(req.headers)
         if (token) {
-            let decoded = await JWT.verifyToken(token)
-            Response.successResponse(req, res, 200, 'USERS-SERVICE', 'Token Valid', decoded)
+            let decoded = await JWT.verifyToken(token, res)
+            Response.successResponse(res, 200, 'USERS-SERVICE', 'Token Valid', decoded)
         }
     } catch (error) {
         res.send(error)

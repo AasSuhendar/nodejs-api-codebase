@@ -1,6 +1,5 @@
-const BasicStrategy = require('passport-http').BasicStrategy;
-const passport = require('passport');
-const utils = require('./utils')
+const BasicStrategy = require('passport-http').BasicStrategy
+const passport = require('passport')
 const JWT = require('./jwt')
 
 passport.use(new BasicStrategy(
@@ -22,7 +21,7 @@ passport.use(new BasicStrategy(
             return done(null, false)
         }
     }
-));
+))
 
 const AuthMiddleware = async (req, res, next) => {
     let {
@@ -32,8 +31,8 @@ const AuthMiddleware = async (req, res, next) => {
     if (authorization == null) {
         res.status(403).send('Unauthorized')
     } else {
-        let typeAuth = authorization.split(" ")[0]
-        let token = authorization.split(" ")[1]
+        let typeAuth = authorization.split(' ')[0]
+        let token = authorization.split(' ')[1]
 
         if (typeAuth !== 'Bearer') {
             res.status(403).send('Unauthorized')

@@ -1,0 +1,44 @@
+version: '2.3'
+
+volumes:
+  mongodata: {}
+
+networks:
+  apinet:
+    driver: bridge
+
+services:
+  mongodb:
+    image: telkomindonesia/alpine:mongodb-3.6
+    networks:
+      - apinet
+    ports:
+      - 27017:27017
+    environment:
+      - MONGODB_USER=user
+      - MONGODB_PASSWORD=password
+      - MONGODB_ADMIN_PASSWORD=password
+      - MONGODB_DATABASE=todo
+    volumes:
+      - mongodata:/var/lib/mongodb/data
+    restart: always
+    # healthcheck:
+    #   test: ["CMD", "sh", "-c", "mongo --eval 'quit(db.runCommand({ ping: 1 }).ok ? 0 : 1)' || exit 1"] 
+    #   interval: 10s
+    #   timeout: 3s
+    #   retries: 3
+
+  todos:
+    build: .
+    image: aassuhendar/todos:latest
+    networks:
+      - apinet
+    ports:
+      - 3000:3000
+    environment:
+      - MONGO_URL_DEV=mongodb://user:password@mongodb/todo
+      - NODE_ENV=dev
+    restart: always
+    # depends_on:
+    #   mongodb:
+    #     condition: service_healthy
