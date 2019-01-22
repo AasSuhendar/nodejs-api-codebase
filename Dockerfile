@@ -29,7 +29,8 @@ RUN rm -rf node_modules \
   && mv /usr/src/node_modules /usr/src/app/ \
   && mkdir -p /.pm2 \
   && chown -R user:root /.pm2 \
-  && chmod 775 /.pm2 
+  && chmod 775 /.pm2 \
+  && chmod 775 uploaded
 
 # expose port
 EXPOSE 3000
@@ -39,6 +40,6 @@ EXPOSE 3000
 
 # Healthcheck
 HEALTHCHECK --interval=3s --timeout=3s CMD ["curl", "http://127.0.0.1:3000/health"] || exit 1
-
+VOLUME ["/usr/src/app/uploaded"]
 # RUN command pm2
 CMD ["sh","-c","pm2 start bin/www --no-daemon -i $PM2_INSTANCE"]

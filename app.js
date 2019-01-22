@@ -9,10 +9,12 @@ const probe = require('kube-probe')
 
 const swagger = require('./docs/swagger')
 const Response = require('./helpers/response')
+const bodyParser = require('body-parser')
 
 const indexRouter = require('./routes/index')
 const authRouter = require('./routes/auth')
 const todosRouter = require('./routes/todos')
+const s3Router = require('./routes/s3')
 
 const app = express()
 app.use(cors())
@@ -43,6 +45,7 @@ app.use(express.urlencoded({
     extended: false
 }))
 app.use(cookieParser())
+app.use(bodyParser.json({ limit: '4mb' }))
 
 // serve swagger
 app.get('/users-services-swagger.json', function (req, res) {
@@ -53,6 +56,7 @@ app.get('/users-services-swagger.json', function (req, res) {
 app.use('/', indexRouter)
 app.use('/api/auth', authRouter)
 app.use('/api/todos', todosRouter)
+app.use('/api/s3', s3Router)
 app.use('/api/api-docs', swagger.swaggerUi.serve, swagger.swaggerUi.setup(swagger.swaggerSpec))
 
 // catch 404 and forward to error handler

@@ -1,5 +1,4 @@
 const dbConnection = require('../database/mongoConnection')
-
 const getIndex = async (req, res) => {
     res.send({
         status: true,
@@ -22,10 +21,7 @@ const healthCheck = async (req, res) => {
     }
 }
 
-
-
-
 module.exports = {
     getIndex,
-    healthCheck
+    healthCheck,
 }

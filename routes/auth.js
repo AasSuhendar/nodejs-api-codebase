@@ -91,4 +91,4 @@ router.post('/private-basic', auth.AuthenticatedBasic,
 router.get('/validate-token', auth.AuthMiddleware, AuthController.validateToken)
 
 
-module.exports = router;
+module.exports = router
