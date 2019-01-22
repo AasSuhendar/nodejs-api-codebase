@@ -30,7 +30,7 @@ RUN rm -rf node_modules \
   && mkdir -p /.pm2 \
   && chown -R user:root /.pm2 \
   && chmod 775 /.pm2 \
-  && chmod 775 /usr/src/app/uploaded
+  && chmod -R 775 uploaded
 
 # expose port
 EXPOSE 3000
