@@ -12,7 +12,6 @@ const generateToken = async ({ exp = 3600, sub = '' } = {}) => {
         sub,
         exp: Math.floor(Date.now() / 1000) + exp,
     }, env.secret_key)
-
     return token
 }
 

@@ -4,11 +4,12 @@ const logger = require('morgan')
 const helmet = require('helmet')
 const cors = require('cors')
 const passport = require('passport')
-const expressValidator = require('express-validator')
+// const expressValidator = require('express-validator')
 const probe = require('kube-probe')
 
 const swagger = require('./docs/swagger')
 const Response = require('./helpers/response')
+const Logger = require('./helpers/logger')
 const bodyParser = require('body-parser')
 
 const indexRouter = require('./routes/index')
@@ -18,7 +19,6 @@ const s3Router = require('./routes/s3')
 
 const app = express()
 app.use(cors())
-app.use(expressValidator())
 probe(app)
 
 // Use the passport package in our application
@@ -62,11 +62,21 @@ app.use('/api/api-docs', swagger.swaggerUi.serve, swagger.swaggerUi.setup(swagge
 // catch 404 and forward to error handler
 app.use(function (req, res) {
     Response.failedResponse(res, 404, 'NOT-FOUND', 'Service not found')
+    Logger.error('Unauthorize access API - Service not found')
 })
 
 // error handler
-app.use(function (err, req, res) {
-    Response.failedResponse(res, 500, 'ERROR-SERVICES', 'Server Error', err.message)
+app.use(function (req, res) {
+    Response.failedResponse(res, 500, 'ERROR-SERVICES', 'Server Error')
 })
 
+
+app.use((error, req, res, next) => {
+    console.log(error);
+    const status = error.statusCode || 500
+    const message = error.message
+    const data = error.data
+    Response.failedResponse(res, status, 'ERROR-SERVICES', 'Error Occured', { message: message, data: data })
+    // res.status(status).json({ message: message, data: data })
+})
 module.exports = app

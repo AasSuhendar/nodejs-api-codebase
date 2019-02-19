@@ -6,7 +6,7 @@ const {
 const auth = require('../helpers/auth')
 
 const AuthController = require('../controllers/auth')
-
+const User = require('../models/user')
 /**
  * @swagger
  * definitions:
@@ -89,6 +89,20 @@ router.post('/private-basic', auth.AuthenticatedBasic,
  *         description: Unauthorized
  */
 router.get('/validate-token', auth.AuthMiddleware, AuthController.validateToken)
+router.post('/signup', [
+    body('email').isEmail().withMessage('Please enter a valid email').custom((value, {req}) => {
+        return User.findOne({ email: value }).then(userDoc => {
+            if (userDoc) {
+                return Promise.reject('E-Mail address already exists!');
+            }
+        })
+    }),
+    body('password').trim().isLength({min:5}),
+    body('name').trim().not().isEmpty()
+], AuthController.signup)
+
+router.post('/login', [], AuthController.login)
+
 
 
 module.exports = router

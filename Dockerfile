@@ -12,7 +12,7 @@ WORKDIR /usr/src/app
 
 # Cached layer for node modules
 ADD package.json /tmp/package.json
-RUN cd /tmp && npm i -g npm && npm install
+RUN cd /tmp && npm i -g npm && npm install --production
 RUN mkdir -p /usr/src/app \
   && cp -a /tmp/node_modules /usr/src
 
@@ -30,7 +30,8 @@ RUN rm -rf node_modules \
   && mkdir -p /.pm2 \
   && chown -R user:root /.pm2 \
   && chmod 775 /.pm2 \
-  && chmod -R 775 uploaded
+  && chmod -R 775 uploaded \
+  && chmod -R 775 logs
 
 # expose port
 EXPOSE 3000
@@ -40,6 +41,10 @@ EXPOSE 3000
 
 # Healthcheck
 HEALTHCHECK --interval=3s --timeout=3s CMD ["curl", "http://127.0.0.1:3000/health"] || exit 1
+
+# Mounting Volume
 VOLUME ["/usr/src/app/uploaded"]
+VOLUME ["/usr/src/app/logs"]
+
 # RUN command pm2
 CMD ["sh","-c","pm2 start bin/www --no-daemon -i $PM2_INSTANCE"]

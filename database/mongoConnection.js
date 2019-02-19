@@ -1,5 +1,6 @@
 const mongoose = require('mongoose')
 const env = require('../configs/env')
+const Logger = require('../helpers/logger')
 
 mongoose.Promise = require('bluebird')
 
@@ -42,16 +43,19 @@ const createMongoConnection = () => {
 
     mongoose.connection.on('error', function (err) {
         console.log('Mongoose connection has occured ' + err)
+        Logger.error('Mongoose connection has occured ' + err)
         process.exit(1) // exit code 1 = error
     })
 
     mongoose.connection.on('disconnected', function () {
         console.log(`Mongoose connection to (${process.env.NODE_ENV}) :${dbUri} is disconnected`)
+        Logger.warn(`Mongoose connection to (${process.env.NODE_ENV}) is disconnected due to application termination`)
     })
 
     process.on('SIGINT', function () {
         mongoose.connection.close(function () {
-            console.log(`Mongoose connection to (${process.env.NODE_ENV}) :${dbUri} is disconnected due to application termination`)
+            console.log(`Mongoose connection close to (${process.env.NODE_ENV}) is disconnected due to application termination`)
+            Logger.error(`Mongoose connection close to (${process.env.NODE_ENV}) is disconnected due to application termination`)
             process.exit(0)
         })
     })

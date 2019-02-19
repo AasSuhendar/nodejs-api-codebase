@@ -1,5 +1,5 @@
 #logs
-logs
+#logs
 *.log
 
 # Runtime data
@@ -35,3 +35,4 @@ cucumber.js
 junit.xml
 test-results.xml
 .env
+.vscode
