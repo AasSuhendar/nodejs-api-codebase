@@ -4,13 +4,17 @@ const logger = require('morgan')
 const helmet = require('helmet')
 const cors = require('cors')
 const passport = require('passport')
+const bodyParser = require('body-parser')
 // const expressValidator = require('express-validator')
 const probe = require('kube-probe')
 
 const swagger = require('./docs/swagger')
 const Response = require('./helpers/response')
 const Logger = require('./helpers/logger')
-const bodyParser = require('body-parser')
+const config = require('./config')
+
+const dbMongo = require('./database/mongoConnection')
+const dbMysql = require('./database/mysqlConnection')
 
 const indexRouter = require('./routes/index')
 const authRouter = require('./routes/auth')
@@ -19,26 +23,37 @@ const s3Router = require('./routes/s3')
 
 const app = express()
 app.use(cors())
+app.use(helmet())
 probe(app)
 
 // Use the passport package in our application
 app.use(passport.initialize())
 require('./helpers/auth')
 
-if (process.env.NODE_ENV === 'dev') {
-    app.use(logger('dev'))
-} else {
-    app.use(logger('combined'))
-    app.use(helmet())
+switch (config.schema.get('env')) {
+    case 'dev':
+        app.use(logger('dev'))
+        break;
+    case 'test':
+        app.use(logger('dev'))
+        break;
+    default:
+        app.use(logger('combined'))
+        break;
 }
 
-if (process.env.DB_TYPE === 'mysql') {
-    const dbConnection = require('./database/mysqlConnection').sequelizeCreateConnection
-    require('./database/mysqlConnection').initialDB(dbConnection)
-} else {
-    const dbConnection = require('./database/mongoConnection')
-    dbConnection.createMongoConnection()
+switch (config.schema.get('db.driver')) {
+    case 'mongo':
+        dbMongo.createMongoConnection()
+        break;
+    case 'mysql':
+        dbMysql.createMysqlConnection()
+        break;
+    default:
+        console.log('Not use db connection ?');
+        break;
 }
+
 
 app.use(express.json())
 app.use(express.urlencoded({

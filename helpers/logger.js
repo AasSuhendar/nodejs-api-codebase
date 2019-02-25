@@ -1,30 +1,38 @@
 const { createLogger, format, transports } = require('winston')
-const { combine, timestamp, label} = format
+const { combine, timestamp, label, printf} = format
 
-var dir = './logs'
+const dir = './logs'
 
-const logger = createLogger({
+const config = require('../config')
+const packageJson = require('../package.json')
+
+const schema = printf(({ level, message, label, timestamp, service }) => {
+    return `{"timestamp":"${timestamp}","level":"${level}","service":"${service}","label":"${label}",message":"${message}"}`
+})
+
+const logger = (tagLabel) => createLogger({
     format: combine(
-        label({ label: 'todo-service-log' }),
+        label({ label: tagLabel }),
         timestamp(),
-        format.json()
+        schema
+        // format.json()
     ),
-    defaultMeta: { service: 'todo-service' },
+    defaultMeta: { service: packageJson.name },
     transports: [
-        new transports.File({
-            level: 'error',
-            filename: dir+'/api-logs.log',
+        // new transports.File({
+        //     level: 'error',
+        //     filename: dir+'/api-logs.log',
+        //     handleExceptions: true,
+        //     json: true,
+        //     maxsize: 5242880,
+        //     maxFiles: 5,
+        //     colorize: true,
+        //     timestamp: true
+        // }),
+        new transports.Console({
+            level: config.schema.get('log.level'),
             handleExceptions: true,
             json: true,
-            maxsize: 5242880,
-            maxFiles: 5,
-            colorize: true,
-            timestamp: true
-        }),
-        new transports.Console({
-            level: 'debug',
-            handleExceptions: true,
-            json: false,
             colorize: true,
             timestamp: true
         })
@@ -32,4 +40,6 @@ const logger = createLogger({
     exitOnError: false
 })
 
-module.exports = logger
+module.exports = {
+    logger
+}

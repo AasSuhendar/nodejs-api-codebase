@@ -24,10 +24,10 @@ const getDownloadObject = async (req, res) => {
 const uploadObject = async (req, res) => {
     
     try {
-        let bucketExists = await s3.s3CreateConnectionMinio().bucketExists(req.params.bucketName)
+        let bucketExists = await s3.getS3Connection().bucketExists(req.params.bucketName)
         
         if (bucketExists) {
-            s3.s3CreateConnectionMinio().putObject(req.params.bucketName, req.file.originalname, req.file.buffer, (err) => {
+            s3.getS3Connection().putObject(req.params.bucketName, req.file.originalname, req.file.buffer, (err) => {
                 if (err) {
                     console.log(err)
                 }
@@ -55,34 +55,6 @@ const uploadObjectFile = async (req, res) => {
             size: req.file.size
         }
         Response.successResponse(res, 200, 'UPLOAD-SERVICE', 'Upload file successfull', returnVal)
-
-        // let bucketExists = await s3.s3CreateConnectionMinio().bucketExists(req.params.bucketName)
-        // var metaData = {
-        //     'Content-Type': 'application/octet-stream'
-        // }
-        // if (bucketExists) {
-        //     s3.s3CreateConnectionMinio().fPutObject(req.params.bucketName, req.file.originalname, req.file.path, metaData, (err) => {
-        //         if (err) {
-        //             console.log(err)
-        //         }
-        //         let returnVal = {
-        //             filename: req.file.originalname,
-        //             mimetype: req.file.mimetype,
-        //             size: req.file.size
-        //         }
-        //         Response.successResponse(res, 200, 'UPLOAD-SERVICE', 'Upload file successfull', returnVal)
-        //     })
-
-        //     let returnVal = {
-        //         filename: req.file.originalname,
-        //         mimetype: req.file.mimetype,
-        //         size: req.file.size
-        //     }
-        //     Response.successResponse(res, 200, 'UPLOAD-SERVICE', 'Upload file successfull', returnVal)
-            
-        // } else {
-        //     Response.failedResponse(res, 500, 'UPLOAD-SERVICE', 'Bucket not exists, please create bucket first')
-        // }
     } catch (error) {
         console.log(error)
     }
