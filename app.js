@@ -11,10 +11,12 @@ const probe = require('kube-probe')
 const swagger = require('./docs/swagger')
 const Response = require('./helpers/response')
 const Logger = require('./helpers/logger')
+const observerEvent = require('./event/observer')
 const config = require('./config')
 
 const dbMongo = require('./database/mongoConnection')
 const dbMysql = require('./database/mysqlConnection')
+const kafkaEvent = require('./helpers/event-kafka')
 
 const indexRouter = require('./routes/index')
 const authRouter = require('./routes/auth')
@@ -25,6 +27,19 @@ const app = express()
 app.use(cors())
 app.use(helmet())
 probe(app)
+
+const producerConfig = {
+    clientIdProducer:'todoKafka',
+}
+const consumerConfig = {
+    clientIdConsumer: 'todoKafka',
+    groupIdConsumer: 'todoGroupConsumer'
+}
+
+kafkaEvent.runKafkaProducer(producerConfig)
+kafkaEvent.runKafkaConsumer(consumerConfig)
+
+observerEvent.init()
 
 // Use the passport package in our application
 app.use(passport.initialize())

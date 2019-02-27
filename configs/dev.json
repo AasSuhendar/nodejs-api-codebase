@@ -26,5 +26,10 @@
         "accessKey": "",
         "secretKey": "",
         "bucket": ""
+    },
+    "event": {
+        "driver": "",
+        "host": "127.0.0.1",
+        "port": "9092"
     }
 }

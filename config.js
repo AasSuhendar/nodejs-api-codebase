@@ -136,6 +136,26 @@ const schema = convict({
             default: false,
             env: 'STORE_USE_SSL'
         }
+    },
+    event: {
+        driver: {
+            doc: 'Event Driver',
+            format: String,
+            default: 'kafka',
+            env: 'EVENT_DRIVER'
+        },
+        host: {
+            doc: 'Event Host',
+            format: 'ipaddress',
+            default: '0.0.0.0',
+            env: 'EVENT_HOST'
+        },
+        port: {
+            doc: 'Event port',
+            format: String,
+            default: '',
+            env: 'EVENT_PORT'
+        },
     }
 })
 schema.loadFile('./configs/' + schema.get('env') + '.json')

@@ -9,6 +9,7 @@ const debug = require('debug')('auth-service:server');
 const http = require('http');
 const config = require('../config')
 const dbConnection = require('../database/mongoConnection')
+const eventConnection = require('../helpers/event-kafka')
 const Logger = require('../helpers/logger')
 
 /**

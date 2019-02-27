@@ -32,6 +32,7 @@
     "http-errors": "~1.6.2",
     "http-status": "^1.2.0",
     "jsonwebtoken": "^8.3.0",
+    "kafkajs": "^1.4.8",
     "kube-probe": "^0.3.1",
     "minio": "^7.0.3",
     "mongoose": "^5.3.4",
