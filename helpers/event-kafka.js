@@ -2,8 +2,8 @@ const { Kafka, CompressionTypes, logLevel } = require('kafkajs')
 const config = require('../config')
 const Logger = require('../helpers/logger')
 
+// singleton producer
 let producer
-let consumer
 
 const kafkaConnection = ({hostBroker, portBroker, clientId}) => {
     const kafka = new Kafka({
@@ -23,29 +23,49 @@ const runKafkaProducer = async ({clientIdProducer}) => {
         }
         
         // Witout Partitioner Setting
-        // producer = kafkaConnection(option).producer()
+        producer = kafkaConnection(option).producer()
 
         // With Partitioner Setting
-        producer = kafkaConnection(option).producer({ createPartitioner: customPartitioner })
+        // let producer = kafkaConnection(option).producer({ createPartitioner: customPartitioner })
 
         await producer.connect()
         Logger.logger('kafka-event').info('Kafka Producer is connected and ready.')
-        disconnectKafka()
+        disconnectKafka('producer', producer)
+        // return producer
     } catch (err) {
         Logger.logger('kafka-event').error(err)
     }
 }
 
-const disconnectKafka = async () => {
+const runKafkaConsumer = async ({ clientIdConsumer, groupIdConsumer }) => {
+    try {
+        let optionConsumer = {
+            groupId: groupIdConsumer
+        }
+        let option = {
+            hostBroker: config.schema.get('event.host'),
+            portBroker: config.schema.get('event.port'),
+            clientId: clientIdConsumer,
+        }
+        let consumer = kafkaConnection(option).consumer(optionConsumer)
+        await consumer.connect()
+        disconnectKafka('consumer', consumer)
+        return consumer
+    } catch (err) {
+        Logger.logger('kafka-event').error(err)
+    }
+}
+
+const disconnectKafka = async (mode,instance) => {
     const errorTypes = ['unhandledRejection', 'uncaughtException']
     const signalTraps = ['SIGTERM', 'SIGINT', 'SIGUSR2']
 
     errorTypes.map(type => {
         return process.on(type, async () => {
             try {
-                Logger.logger('kafka-event').warn(`process.on ${type} occured on producer and consumer Event Kafka`)
-                await producer.disconnect()    
-                await consumer.disconnect()    
+                Logger.logger('kafka-event').warn(`process.on ${type} occured on ${mode} Event Kafka`)
+                Logger.logger('kafka-event').info(`Kafka ${mode} is stop`)
+                await instance.disconnect()
                 return process.exit(0)
             } catch (_) {
                 process.exit(1)
@@ -56,9 +76,9 @@ const disconnectKafka = async () => {
     signalTraps.map(type => {
         return process.once(type, async () => {
             try {
-                Logger.logger('kafka-event').warn(`process.on ${type} occured on producer and consumer Event Kafka`)
-                await producer.disconnect()
-                await consumer.disconnect()
+                Logger.logger('kafka-event').warn(`process.on ${type} occured on ${mode} Event Kafka`)
+                Logger.logger('kafka-event').info(`Kafka ${mode} is stop`)
+                await instance.disconnect()
             } finally {
                 process.kill(process.pid, type)
             }
@@ -66,32 +86,11 @@ const disconnectKafka = async () => {
     })
 }
 
-const runKafkaConsumer = async ({clientIdConsumer,groupIdConsumer}) => {
-    try {
-        let optionConsumer = {
-            groupId: groupIdConsumer
-        }
-        let option = {
-            hostBroker: config.schema.get('event.host'),
-            portBroker: config.schema.get('event.port'),
-            clientId: clientIdConsumer,
-        }
-        consumer = kafkaConnection(option).consumer(optionConsumer)
-        await consumer.connect()
-        disconnectKafka()
-    } catch (err) {
-        Logger.logger('kafka-event').error(err)
-    }
-}
-
 const customPartitioner = () => {
     return ({ topic, partitionMetadata, message }) => {
         // select a partition based on some logic
         // return the partition number
-        console.log(topic);
-        console.log(message);
-        
-        if (message.key === 'key-event1') {
+        if (message.key === 'key-partition0') {
             return 0    
         } else {
             return 1
@@ -100,46 +99,31 @@ const customPartitioner = () => {
     }
 }
 
-const sendMessageProducer =  async (key, topic, data) => {
+const sendMessageProducer =  async (key, topic, partition, data) => {
     try {
         let valueMessage = new Buffer.from(JSON.stringify(data))
-        await producer.send({
+        let status = await producer.send({
             topic,
             compression: CompressionTypes.GZIP,
             messages: [{
                 key: key,
-                value: valueMessage
+                value: valueMessage,
+                partition: partition
             }]
         })
+        console.log(status);
+        
+        if (!status) {
+            return false
+        }
+        return true
     } catch (err) {
         Logger.logger('kafka-event').error(err)
     }
-}
-
-
-const consumeMessage = async (topic) => {
-    await consumer.subscribe({ topic: topic })
-    return consumer
-}
-
-const deleteTopic = async (topic) => {
-    let option = {
-        hostBroker: config.schema.get('event.host'),
-        portBroker: config.schema.get('event.port'),
-        clientId: 'todoKafka',
-    }
-    let admin = kafkaConnection(option).admin()
-    await admin.connect()
-    await admin.deleteTopics({
-        topics: topic,
-        timeout: 5000,
-    })
 }
 
 module.exports = {
     runKafkaProducer,
     runKafkaConsumer,
     sendMessageProducer,
-    consumeMessage,
-    deleteTopic
 }

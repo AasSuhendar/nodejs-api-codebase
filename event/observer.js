@@ -5,8 +5,12 @@ const init = () => {
     initEventListener();
 };
 const initEventListener = async () => {
-    await consumerEventHandler.consumerEvent()
-    // await consumerEventHandler.consumerEventSingleton()
+    try {
+        await consumerEventHandler.consumerEvent()
+        await consumerEventHandler.consumerEventNotif()
+    } catch (err) {
+        console.log(err)
+    }
 };
 
 module.exports = {

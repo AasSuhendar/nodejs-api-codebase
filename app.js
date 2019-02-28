@@ -29,16 +29,13 @@ app.use(helmet())
 probe(app)
 
 const producerConfig = {
-    clientIdProducer:'todoKafka',
-}
-const consumerConfig = {
-    clientIdConsumer: 'todoKafka',
-    groupIdConsumer: 'todoGroupConsumer'
+    clientIdProducer:'playcourtKafkaProducer1',
 }
 
+// singleton producer init
 kafkaEvent.runKafkaProducer(producerConfig)
-kafkaEvent.runKafkaConsumer(consumerConfig)
 
+// observer consumer init
 observerEvent.init()
 
 // Use the passport package in our application

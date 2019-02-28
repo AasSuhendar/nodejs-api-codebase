@@ -2,7 +2,6 @@ const express = require('express')
 const router = express.Router()
 const IndexController = require('../controllers/index')
 const ProducerController = require('../controllers/producer')
-const ConsumerController = require('../controllers/consumer')
 
 /**
  * @swagger
@@ -68,6 +67,5 @@ router.get('/', IndexController.getIndex)
 
 router.get('/health', IndexController.healthCheck)
 router.post('/sendMessage', ProducerController.sendMessage)
-router.post('/deleteTopic', ProducerController.deleteTopic)
 
 module.exports = router
