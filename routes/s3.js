@@ -4,7 +4,6 @@ const s3Controller = require('../controllers/s3')
 const multerConfig = require('../helpers/multer')
 
 router.get('/getBucketList', s3Controller.getBucketlist)
-router.get('/getListObject/:bucketName', s3Controller.getListObject)
 router.get('/getDownloadObject/:bucketName/:filename', s3Controller.getDownloadObject)
 router.post('/makeBucket', s3Controller.makeBucket)
 router.post('/uploadToDir', multerConfig.uploadToDir.single('uploadfile'), s3Controller.uploadObjectFile)

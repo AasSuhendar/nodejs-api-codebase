@@ -21,13 +21,12 @@ const getS3Connection = () => {
                 endPoint: config.schema.get('store.endPoint'),
                 port: config.schema.get('store.port'),
                 useSSL: config.schema.get('store.useSSL'),
-                accessKey: '7ZYICBPUU9NJLFZUPONV',
-                secretKey: 'jOr8O6vwJsE6p+EqJNu4nDVn+lHDTlCWF7YbOjLu'
+                accessKey: config.schema.get('store.accessKey'),
+                secretKey: config.schema.get('store.secretKey')
             })
             break;
         
         case 'aws':
-            
             break
         default:
             break;
@@ -47,7 +46,7 @@ const getListBucketAWS =  async () =>{
 
 const getListBucketMinio = async () => {
     try {
-        let list = s3CreateConnectionMinio().listBuckets()
+        let list = getS3Connection().listBuckets()
         return list    
     } catch (error) {
         console.log(error)
@@ -56,7 +55,7 @@ const getListBucketMinio = async () => {
 
 const makeBucketMinio = async (bucketName) => {
     try {
-        let list = s3CreateConnectionMinio().makeBucket(bucketName, 'us-east-1')
+        let list = getS3Connection().makeBucket(bucketName, 'us-east-1')
         if (list) {
             console.log('Bucket created successfully in "us-east-1".')
             return list
@@ -68,13 +67,15 @@ const makeBucketMinio = async (bucketName) => {
 }
 
 const listObject = async (bucketName) => {
-    var stream = s3CreateConnectionMinio().listObjects(bucketName, '', true)
-    var obj = await stream.on('data', function (obj) { console.log(obj) })
+    var stream = getS3Connection().listObjects(bucketName, '', true)
+    var obj = await stream.on('data', function (obj) { return console.log(obj) })
+    console.log(obj);
+    
     return obj
 }
 
 const getDownloadObject = async (bucketName, fileName) => {
-    var data = await s3CreateConnectionMinio().getObject(bucketName, fileName, (err, stream)=> {
+    var data = await getS3Connection().getObject(bucketName, fileName, (err, stream)=> {
         if (err) {
             console.log(err)
         }

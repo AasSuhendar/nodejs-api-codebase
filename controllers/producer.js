@@ -2,11 +2,7 @@ const kafkaEvent = require('../helpers/event-kafka')
 
 const sendMessage = async (req, res) => {
     try {
-        let data = {
-            name: req.body.name,
-            email: req.body.email,
-            status: req.body.status
-        }
+        let data = req.body
         
         let send = await kafkaEvent.sendMessageProducer(req.body.key, req.body.topic, req.body.partition, data)
         

@@ -36,7 +36,7 @@ const producerConfig = {
 kafkaEvent.runKafkaProducer(producerConfig)
 
 // observer consumer init
-observerEvent.init()
+// observerEvent.init()
 
 // Use the passport package in our application
 app.use(passport.initialize())

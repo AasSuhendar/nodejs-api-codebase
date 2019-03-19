@@ -29,8 +29,8 @@ const runKafkaProducer = async ({clientIdProducer}) => {
         // let producer = kafkaConnection(option).producer({ createPartitioner: customPartitioner })
 
         await producer.connect()
-        Logger.logger('kafka-event').info('Kafka Producer is connected and ready.')
-        disconnectKafka('producer', producer)
+        Logger.logger('kafka-event').info('[Producer] Kafka Producer is connected and ready.')
+        disconnectKafka('Producer', producer)
         // return producer
     } catch (err) {
         Logger.logger('kafka-event').error(err)
@@ -49,7 +49,7 @@ const runKafkaConsumer = async ({ clientIdConsumer, groupIdConsumer }) => {
         }
         let consumer = kafkaConnection(option).consumer(optionConsumer)
         await consumer.connect()
-        disconnectKafka('consumer', consumer)
+        disconnectKafka('Consumer', consumer)
         return consumer
     } catch (err) {
         Logger.logger('kafka-event').error(err)
@@ -64,7 +64,7 @@ const disconnectKafka = async (mode,instance) => {
         return process.on(type, async () => {
             try {
                 Logger.logger('kafka-event').warn(`process.on ${type} occured on ${mode} Event Kafka`)
-                Logger.logger('kafka-event').info(`Kafka ${mode} is stop`)
+                Logger.logger('kafka-event').info(`[${mode}] Kafka ${mode} is stop`)
                 await instance.disconnect()
                 return process.exit(0)
             } catch (_) {
@@ -77,7 +77,7 @@ const disconnectKafka = async (mode,instance) => {
         return process.once(type, async () => {
             try {
                 Logger.logger('kafka-event').warn(`process.on ${type} occured on ${mode} Event Kafka`)
-                Logger.logger('kafka-event').info(`Kafka ${mode} is stop`)
+                Logger.logger('kafka-event').info(`[${mode}] Kafka ${mode} is stop`)
                 await instance.disconnect()
             } finally {
                 process.kill(process.pid, type)
@@ -111,8 +111,7 @@ const sendMessageProducer =  async (key, topic, partition, data) => {
                 partition: partition
             }]
         })
-        console.log(status);
-        
+        Logger.logger('kafka-event').info(`[Producer] send data to '${topic}' in partition ${partition} success`)
         if (!status) {
             return false
         }

@@ -11,18 +11,12 @@ const makeBucket = async (req, res) => {
     res.status(200).json(list)
 }
 
-const getListObject = async (req,res) => {
-    let list = await s3.listObject(req.params.bucketName)
-    res.status(200).json(list)
-}
-
 const getDownloadObject = async (req, res) => {
     let list = await s3.getDownloadObject(req.params.bucketName,req.params.filename)
     res.status(200).json(list) 
 }
 
 const uploadObject = async (req, res) => {
-    
     try {
         let bucketExists = await s3.getS3Connection().bucketExists(req.params.bucketName)
         
@@ -44,10 +38,9 @@ const uploadObject = async (req, res) => {
     } catch (error) {
         console.log(error)
     }
-    
 }
-const uploadObjectFile = async (req, res) => {
 
+const uploadObjectFile = async (req, res) => {
     try {
         let returnVal = {
             filename: req.file.originalname,
@@ -65,7 +58,6 @@ const uploadObjectFile = async (req, res) => {
 module.exports = {
     getBucketlist,
     makeBucket,
-    getListObject,
     getDownloadObject,
     uploadObject,
     uploadObjectFile
