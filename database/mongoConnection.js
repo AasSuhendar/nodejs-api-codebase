@@ -1,52 +1,60 @@
 const mongoose = require('mongoose')
 const env = require('../configs/env')
+const config = require('../config')
+const Logger = require('../helpers/logger')
 
 mongoose.Promise = require('bluebird')
 
+const checkConnection = async () => {
+    var db = mongoose.connection
+    var status = db.db.admin().command({
+        ping: 1,
+    })
+    let returnVal = await status
+    return returnVal
+}
+
+const cleanUpConnection = async () => {
+    mongoose.connection.close(function () {
+        Logger.logger('mongoo-server').info(`Mongoose connection close to (${config.schema.get('env')}) is disconnected due to application termination`)
+    })
+}
+
 const createMongoConnection = () => {
 
-    let dbUri=''
-    if (process.env.NODE_ENV === 'test') {
-        mongoose.connect(env.database_test, {
-            useNewUrlParser: true,
-            useCreateIndex: true
-        })
-        dbUri = env.database_test
-        
-    } else if (process.env.NODE_ENV === 'dev') {
-        mongoose.connect(env.database_dev, {
-            useNewUrlParser: true,
-            useCreateIndex: true
-        })
-        dbUri = env.database_dev
-    } else if (process.env.NODE_ENV === 'prod') {
-        mongoose.connect(env.database_prod, {
-            useNewUrlParser: true,
-            useCreateIndex: true
-        })
-        dbUri = env.database_prod
+    let dbURI
+
+    if (config.schema.get('db.username') == '' || config.schema.get('db.password') == '' || config.schema.get('db.name') == '') {
+        dbURI = 'mongodb://' + config.schema.get('db.host') + ':' + config.schema.get('db.port')
+    } else if (config.schema.get('db.username') == '' || config.schema.get('db.password') == '') {
+        dbURI = 'mongodb://' + config.schema.get('db.username') + ':' + config.schema.get('db.password') + '@' +
+            config.schema.get('db.host') + ':' + config.schema.get('db.port')
+    } else {
+        dbURI = 'mongodb://' + config.schema.get('db.username') + ':' + config.schema.get('db.password') + '@' +
+            config.schema.get('db.host') + ':' + config.schema.get('db.port') + '/' + config.schema.get('db.name')
     }
 
+    mongoose.connect(dbURI, {
+        useNewUrlParser: true,
+        useCreateIndex: true
+    })
+
     mongoose.connection.on('connected', function () {
-        console.log(`Mongoose connection open to (${process.env.NODE_ENV}) :${dbUri}`)
+        Logger.logger('mongoo-server').info('Server Master Started at PID ' + process.pid)
     })
 
     mongoose.connection.on('error', function (err) {
-        console.log("Mongoose connection has occured " + err + " error");
-    });
+        Logger.logger('mongoo-server').error('Mongoose connection has occured ' + err)
+        process.exit(1) // exit code 1 = error
+    })
 
     mongoose.connection.on('disconnected', function () {
-        console.log(`Mongoose connection to (${process.env.NODE_ENV}) :${dbUri} is disconnected`);
-    });
-
-    process.on('SIGINT', function () {
-        mongoose.connection.close(function () {
-            console.log(`Mongoose connection to (${process.env.NODE_ENV}) :${dbUri} is disconnected due to application termination`);
-            process.exit(0)
-        });
-    });
+        Logger.logger('mongoo-server').info(`Mongoose connection to (${config.schema.get('env')}) is disconnected`)
+    })
 }
 
 module.exports = {
-    createMongoConnection
+    createMongoConnection,
+    checkConnection,
+    cleanUpConnection
 }

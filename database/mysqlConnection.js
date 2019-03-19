@@ -1,19 +1,16 @@
-const env = require('../configs/env');
-const DSNParser = require('dsn-parser');
+const env = require('../configs/env')
+const config = require('../config')
+const DSNParser = require('dsn-parser')
 const Sequelize = require('sequelize')
+const Logger = require('../helpers/logger')
 
 const connType = () => {
-    if (process.env.NODE_ENV === 'test') {
-        return new DSNParser(env.database_mysql_test).getParts();
-    } else if (process.env.NODE_ENV === 'dev') {
-        return new DSNParser(env.database_mysql_dev).getParts();
-    } else if (process.env.NODE_ENV === 'prod') {
-        return new DSNParser(env.database_mysql_prod).getParts();
-    }
+    let dbURI = 'mysql://' + config.schema.get('db.username') + ':' + config.schema.get('db.password') + '@' +
+        config.schema.get('db.host') + ':' + config.schema.get('db.port') + '/' + config.schema.get('db.name')
+    return new DSNParser(dbURI).getParts()
 }
 
-
-const sequelizeCreateConnection = new Sequelize(connType().database, connType().user, connType().password, {
+const sequelizePoolConnection = new Sequelize(connType().database, connType().user, connType().password, {
     operatorsAliases: false,
     host: connType().host,
     dialect: 'mysql',
@@ -26,26 +23,40 @@ const sequelizeCreateConnection = new Sequelize(connType().database, connType().
     logging: console.log // value = false, or console.log
 })
 
-const initialDB = (sequelize) => {
-    sequelize
+const checkConnection = async () => {
+    let status = await sequelizePoolConnection
         .authenticate()
-        .then(function (err) {
-            console.log('Connection has been established successfully.');
-        }, function (err) {
-            console.log('Unable to connect to the database:', err);
-        });
-
-    sequelize.sync({
-            // force: true
-        })
         .then(() => {
-            console.log(`Database & tables created!`)
+            Logger.logger('mysql-server').info('Connection has been established successfully.')
+            return true
+        }, (err) => {
+            Logger.logger('mysql-server').error('Unable to connect to the database:', err)
+            return false
+        })
+    return status
+}
+
+const createMysqlConnection = () => {
+    sequelizePoolConnection
+        .authenticate()
+        .then(function () {
+            Logger.logger('mysql-server').info('Connection has been established successfully.')
+        }, function (err) {
+            Logger.logger('mysql-server').error('Unable to connect to the database:', err)
         })
 
-    return sequelize
+    sequelizePoolConnection.sync({
+        // force: true
+    })
+        .then(() => {
+            Logger.logger('mysql-server').info('Database & tables created!')
+        })
+
+    return sequelizePoolConnection
 }
 
 module.exports = {
-    sequelizeCreateConnection,
-    initialDB
-};
+    sequelizePoolConnection,
+    createMysqlConnection,
+    checkConnection
+}

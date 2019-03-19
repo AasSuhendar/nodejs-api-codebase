@@ -1,5 +1,5 @@
 const Sequelize = require('sequelize')
-const sequelize = require('../database/mysqlConnection').sequelizeCreateConnection
+const sequelize = require('../database/mysqlConnection').sequelizePoolConnection
 
 const Todo = sequelize.define('Todo', {
     id: {

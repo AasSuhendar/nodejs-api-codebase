@@ -4,33 +4,46 @@
  * Module dependencies.
  */
 
-var app = require('../app');
-var debug = require('debug')('auth-service:server');
-var http = require('http');
-var env = require('../configs/env')
+const app = require('../app');
+const debug = require('debug')('auth-service:server');
+const http = require('http');
+const config = require('../config')
+const dbConnection = require('../database/mongoConnection')
+const Logger = require('../helpers/logger')
 
 /**
  * Get port from environment and store in Express.
  */
-
-var port = normalizePort(env.apps_ports || '3000');
+const port = normalizePort(config.schema.get('server.port'));
 app.set('port', port);
 
 /**
  * Create HTTP server.
  */
 
-var server = http.createServer(app);
+const server = http.createServer(app);
 
 /**
  * Listen on provided port, on all network interfaces.
  */
 
 server.listen(port);
-console.log('Apps listening at port: ' + port);
-
+Logger.logger('info-initial-server').info('Apps listening at port: ' + port)
 server.on('error', onError);
 server.on('listening', onListening);
+
+/**
+ * Graceful shutdown
+ */
+process.on('SIGINT', () => {
+  Logger.logger('info-closing-server').warn('Closing server at ' + new Date())
+  Logger.logger('info-closing-db-connection').warn(`Mongoose connection to (${config.schema.get('env')}) is disconnected`)
+  server.close( async () => {
+    Logger.logger('info-closing-server').warn('Server closed ' + new Date())
+    await dbConnection.cleanUpConnection()
+    process.exit()
+  })
+})
 
 /**
  * Normalize a port into a number, string, or false.

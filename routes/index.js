@@ -1,6 +1,7 @@
-const express = require('express');
-const router = express.Router();
+const express = require('express')
+const router = express.Router()
 const IndexController = require('../controllers/index')
+const ProducerController = require('../controllers/producer')
 
 /**
  * @swagger
@@ -30,7 +31,7 @@ const IndexController = require('../controllers/index')
  *         schema:
  *           $ref: '#/definitions/MainEndPoint'
  */
-router.get('/', IndexController.getIndex);
+router.get('/', IndexController.getIndex)
 
 /**
  * @swagger
@@ -64,4 +65,7 @@ router.get('/', IndexController.getIndex);
  *         description: Service Unavailable
  */
 
-module.exports = router;
+router.get('/health', IndexController.healthCheck)
+router.post('/sendMessage', ProducerController.sendMessage)
+
+module.exports = router
