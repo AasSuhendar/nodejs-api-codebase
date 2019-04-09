@@ -34,5 +34,7 @@ cypress.json
 cucumber.js
 junit.xml
 test-results.xml
+
 .env
 .vscode
+.sonarlint
