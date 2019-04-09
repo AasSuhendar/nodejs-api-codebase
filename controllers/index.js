@@ -1,12 +1,22 @@
 const dbMongo = require('../database/mongoConnection')
 const dbMysql = require('../database/mysqlConnection')
-const config = require('../config')
+const config = require('../config').default
+const auth = require('../helpers/auth-jwt')
 
 const getIndex = async (req, res) => {
     res.send({
         status: true,
         statusCode: 200,
         msg: 'Wellcome main endpoint API Todos Service'
+    })
+}
+
+const getSecure = async (req, res) => {
+    let dataClaims = auth.getClaims(res.get('X-JWT-Claims'))
+    res.send({
+        status: true,
+        statusCode: 200,
+        msg: 'Wellcome to secure api ' + dataClaims.data.user
     })
 }
 
@@ -40,12 +50,10 @@ const healthCheck = async (req, res) => {
             status: 'Healty. You not use db'
         })
     }
-
-    
-    
 }
 
 module.exports = {
     getIndex,
+    getSecure,
     healthCheck,
 }

@@ -29,18 +29,18 @@ app.use(helmet())
 probe(app)
 
 const producerConfig = {
-    clientIdProducer:'playcourtKafkaProducer1',
+    clientIdProducer:'KafkaProducer1',
 }
 
 // singleton producer init
-kafkaEvent.runKafkaProducer(producerConfig)
+// kafkaEvent.runKafkaProducer(producerConfig) // uncomment this for activate
 
 // observer consumer init
-// observerEvent.init()
+// observerEvent.init() // uncomment this for activate
 
 // Use the passport package in our application
 app.use(passport.initialize())
-require('./helpers/auth')
+require('./helpers/auth-basic')
 
 switch (config.schema.get('env')) {
     case 'dev':
@@ -80,16 +80,25 @@ app.get('/users-services-swagger.json', function (req, res) {
     res.send(swagger.swaggerSpec)
 })
 
+// logger http access
+app.use(function (req, res, next) {
+    if (req.url !== '/favicon.ico') {
+        Logger.logger('http-access').info('Access Method ' + req.method + ' at URI ' + req.url)
+    }
+    next()
+})
+
 app.use('/', indexRouter)
 app.use('/api/auth', authRouter)
 app.use('/api/todos', todosRouter)
 app.use('/api/s3', s3Router)
 app.use('/api/api-docs', swagger.swaggerUi.serve, swagger.swaggerUi.setup(swagger.swaggerSpec))
 
+
 // catch 404 and forward to error handler
 app.use(function (req, res) {
     Response.failedResponse(res, 404, 'NOT-FOUND', 'Service not found')
-    Logger.error('Unauthorize access API - Service not found')
+    Logger.logger('http-access').error('Unauthorize access API - Service not found')
 })
 
 // error handler
@@ -99,11 +108,9 @@ app.use(function (req, res) {
 
 
 app.use((error, req, res, next) => {
-    console.log(error);
     const status = error.statusCode || 500
     const message = error.message
     const data = error.data
     Response.failedResponse(res, status, 'ERROR-SERVICES', 'Error Occured', { message: message, data: data })
-    // res.status(status).json({ message: message, data: data })
 })
 module.exports = app

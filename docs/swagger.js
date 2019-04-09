@@ -1,6 +1,7 @@
 const swaggerJSDoc = require('swagger-jsdoc')
 const swaggerUi = require('swagger-ui-express')
-const env = require('../configs/env')
+const config = require('../config')
+
 // swagger definition
 var swaggerDefinition = {
     info: {
@@ -8,7 +9,7 @@ var swaggerDefinition = {
         version: '1.0.0',
         description: 'Users-Services describe with RESTful API with Swagger',
     },
-    host: env.swagger_host,
+    host: config.schema.get('server.address') + ':' + config.schema.get('server.port'),
     basePath: '/',
     schemes: [
         'http', 'https'

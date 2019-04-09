@@ -1,5 +1,5 @@
 const Response = require('../helpers/response')
-const JWT = require('../helpers/jwt')
+const JWT = require('../helpers/auth-jwt')
 const utils = require('../helpers/utils')
 const bcrypt = require('bcryptjs')
 const { validationResult } = require('express-validator/check');

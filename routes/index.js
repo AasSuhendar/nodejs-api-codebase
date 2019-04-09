@@ -2,7 +2,7 @@ const express = require('express')
 const router = express.Router()
 const IndexController = require('../controllers/index')
 const ProducerController = require('../controllers/producer')
-
+const auth = require('../helpers/auth-jwt')
 /**
  * @swagger
  * definitions:
@@ -66,6 +66,8 @@ router.get('/', IndexController.getIndex)
  */
 
 router.get('/health', IndexController.healthCheck)
+router.get('/secure', auth.AuthenticateJWT, IndexController.getSecure)
 router.post('/sendMessage', ProducerController.sendMessage)
+router.post('/sendMessageMultiply', ProducerController.sendMessageMultiply)
 
 module.exports = router
