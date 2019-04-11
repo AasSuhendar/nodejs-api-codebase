@@ -148,7 +148,8 @@ pipeline {
                 stage ('Re-tag Image'){
                     steps{
                         echo "Retaging Image"
-                        sh "docker tag ${params.DOCKER_IMAGE_NAME}:${BUILD_NUMBER}-${commitId}\${imageNameFinal}:latest"
+                        sh "docker tag ${params.DOCKER_IMAGE_NAME}:${BUILD_NUMBER}-${commitId}\
+                                    ${imageNameFinal}:latest"
                     }
                 }
                 stage ('Deploy'){
