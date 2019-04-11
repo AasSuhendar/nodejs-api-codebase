@@ -57,23 +57,6 @@ const postTodoMongo = async (req, res) => {
 }
 
 const putTodoMongo = async (req, res) => {
-    // Todo.findByIdAndUpdate({
-    //     _id: req.params.id
-    // }, {
-    //     $set: {
-    //         name: req.body.name,
-    //         description: req.body.description,
-    //         status: req.body.status
-    //     }
-    // }, {
-    //     new: true
-    // }, (err, todo) => {
-    //     if (err) {
-    //         Response.failedResponse(res, 400, 'TODO-SERVICE', 'Update Todos Failed', err)
-    //     } else {
-    //         Response.successResponse(res, 200, 'TODO-SERVICE', 'Update Todos Success', todo)
-    //     }
-    // })
     try {
         let todo = await Todo.findOneAndUpdate(
             {_id: req.params.id}, 

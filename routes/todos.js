@@ -1,7 +1,7 @@
 const express = require('express')
 const router = express.Router()
 const TodoController = require('../controllers/todo')
-const auth = require('../helpers/auth')
+const auth = require('../helpers/auth-basic')
 
 /**
  * @swagger

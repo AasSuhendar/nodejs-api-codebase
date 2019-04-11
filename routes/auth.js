@@ -3,10 +3,13 @@ const router = express.Router();
 const {
     body
 } = require('express-validator/check');
-const auth = require('../helpers/auth')
+const auth = require('../helpers/auth-basic')
+const jwt = require('../helpers/auth-jwt')
+const response = require('../helpers/response')
 
 const AuthController = require('../controllers/auth')
 const User = require('../models/user')
+
 /**
  * @swagger
  * definitions:
@@ -61,6 +64,16 @@ const User = require('../models/user')
  *       401:
  *         description: Unauthorized user with the specified ID was not found.
  */
+router.get('/basic', auth.AuthenticateBasic,
+    function (req, res) {
+        let dataBody = JSON.parse(req.body)
+        if (dataBody.username.length === 0 || dataBody.password.length === 0) {
+            response.resBadRequest(res, 'Invalid Authorizaton')
+            return
+        }
+        response.successResponse(res, 200, 'AUTH', 'Basic Auth Success', { token: jwt.getToken({ user: dataBody.username, status: 'active', status1: 'active1'})})
+    })
+
 router.get('/private-basic', auth.AuthenticatedBasic,
     function (req, res) {
         res.json(req.user)
@@ -93,7 +106,7 @@ router.post('/signup', [
     body('email').isEmail().withMessage('Please enter a valid email').custom((value, {req}) => {
         return User.findOne({ email: value }).then(userDoc => {
             if (userDoc) {
-                return Promise.reject('E-Mail address already exists!');
+                return Promise.reject('E-Mail address already exists!')
             }
         })
     }),
@@ -102,6 +115,7 @@ router.post('/signup', [
 ], AuthController.signup)
 
 router.post('/login', [], AuthController.login)
+router.post('/login-v2', [], AuthController.loginV2)
 
 
 

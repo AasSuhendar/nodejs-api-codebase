@@ -1,0 +1,7 @@
+node_modules/
+.env
+.vscode
+.sonarlint
+.nyc_output
+.DS_Store
+test-results.xml

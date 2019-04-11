@@ -20,7 +20,7 @@ services:
       - MONGODB_USER=user
       - MONGODB_PASSWORD=password
       - MONGODB_ADMIN_PASSWORD=password
-      - MONGODB_DATABASE=todo
+      - MONGODB_DATABASE=codebase-api
     volumes:
       - mongodata:/var/lib/mongodb/data
     restart: always
@@ -30,16 +30,22 @@ services:
     #   timeout: 3s
     #   retries: 3
 
-  todos:
+  codebase-api:
     build: .
-    image: aassuhendar/todos:latest
+    image: aassuhendar/codebase-api:latest
     networks:
       - apinet
     ports:
       - 3000:3000
     environment:
-      - MONGO_URL_DEV=mongodb://user:password@mongodb/todo
       - NODE_ENV=dev
+      - NODE_SERVER_PORT=3000
+      - DB_DRIVER=mongo
+      - DB_HOST=mongodb
+      - DB_PORT=27017
+      - DB_USERNAME=user
+      - DB_PASSWORD=password
+      - DB_NAME=codebase-api
     restart: always
     volumes:
       - uploaddata:/usr/src/app/uploaded

@@ -1,5 +1,4 @@
 const mongoose = require('mongoose')
-const env = require('../configs/env')
 const config = require('../config')
 const Logger = require('../helpers/logger')
 
@@ -23,7 +22,7 @@ const cleanUpConnection = async () => {
 const createMongoConnection = () => {
 
     let dbURI
-
+    
     if (config.schema.get('db.username') == '' || config.schema.get('db.password') == '' || config.schema.get('db.name') == '') {
         dbURI = 'mongodb://' + config.schema.get('db.host') + ':' + config.schema.get('db.port')
     } else if (config.schema.get('db.username') == '' || config.schema.get('db.password') == '') {
@@ -33,14 +32,14 @@ const createMongoConnection = () => {
         dbURI = 'mongodb://' + config.schema.get('db.username') + ':' + config.schema.get('db.password') + '@' +
             config.schema.get('db.host') + ':' + config.schema.get('db.port') + '/' + config.schema.get('db.name')
     }
-
+    
     mongoose.connect(dbURI, {
         useNewUrlParser: true,
         useCreateIndex: true
     })
 
     mongoose.connection.on('connected', function () {
-        Logger.logger('mongoo-server').info('Server Master Started at PID ' + process.pid)
+        Logger.logger('mongoo-server').info('Mongoose connection has connected')
     })
 
     mongoose.connection.on('error', function (err) {

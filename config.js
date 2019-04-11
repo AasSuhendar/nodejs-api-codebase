@@ -1,9 +1,9 @@
 const env = require('dotenv')
 const convict = require('convict')
 
+env.config()
 
-// -------------------------------------------------
-// Configuration Schema Constant
+// Configuration Schema
 const schema = convict({
     env: {
         doc: 'The Application Environment',
@@ -28,7 +28,7 @@ const schema = convict({
             path: {
                 doc: 'The Application Upload Path',
                 format: String,
-                default: './public/uploads',
+                default: './uploaded',
                 env: 'NODE_SERVER_UPLOAD_PATH'
             }
         }
@@ -45,7 +45,7 @@ const schema = convict({
         expired: {
             doc: 'JWT Authentication Expiration',
             format: String,
-            default: '1d',
+            default: '1h',
             env: 'JWT_EXPIRED'
         }
     },
@@ -146,25 +146,22 @@ const schema = convict({
         },
         host: {
             doc: 'Event Host',
-            format: 'ipaddress',
+            format: '*',
             default: '0.0.0.0',
             env: 'EVENT_HOST'
         },
         port: {
             doc: 'Event port',
-            format: String,
+            format: 'port',
             default: '',
             env: 'EVENT_PORT'
         },
     }
 })
+
 schema.loadFile('./configs/' + schema.get('env') + '.json')
 schema.validate({ allowed: 'strict' })
-env.config()
 
-
-// -------------------------------------------------
-// Export Module
 module.exports = {
     schema
 }

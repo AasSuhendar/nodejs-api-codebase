@@ -11,7 +11,7 @@
         "level": "info"
     },
     "jwt": {
-        "expired": "1d"
+        "expired": "1h"
     },
     "db": {
         "driver": "",

@@ -21,6 +21,7 @@ const runKafkaProducer = async ({clientIdProducer}) => {
             portBroker: config.schema.get('event.port'),
             clientId: clientIdProducer,
         }
+        console.log(option);
         
         // Witout Partitioner Setting
         producer = kafkaConnection(option).producer()
@@ -121,8 +122,27 @@ const sendMessageProducer =  async (key, topic, partition, data) => {
     }
 }
 
+const sendMessageMultiplyProducer = async (key, topic, partition, data) => {
+    try {
+        
+        let status = await producer.send({
+            topic,
+            compression: CompressionTypes.GZIP,
+            messages: data
+        })
+        Logger.logger('kafka-event').info(`[Producer] send data to '${topic}' in partition ${partition} success`)
+        if (!status) {
+            return false
+        }
+        return true
+    } catch (err) {
+        Logger.logger('kafka-event').error(err)
+    }
+}
+
 module.exports = {
     runKafkaProducer,
     runKafkaConsumer,
     sendMessageProducer,
+    sendMessageMultiplyProducer
 }

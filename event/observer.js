@@ -7,7 +7,7 @@ const init = () => {
 const initEventListener = async () => {
     try {
         await consumerEventHandler.consumerEvent()
-        await consumerEventHandler.consumerEventNotif()
+        // await consumerEventHandler.consumerEventNotif()
     } catch (err) {
         console.log(err)
     }

@@ -1,21 +1,32 @@
 const { createLogger, format, transports } = require('winston')
-const { combine, timestamp, label, printf} = format
+const { combine, label, printf} = format
+const moment = require('moment-timezone')
 
 const dir = './logs'
 
 const config = require('../config')
 const packageJson = require('../package.json')
 
-const schema = printf(({ level, message, label, timestamp, service }) => {
-    return `{"timestamp":"${timestamp}","level":"${level}","service":"${service}","label":"${label}",message":"${message}"}`
+// -------------------------------------------------
+// Log Schema Timestamp Constant
+const schemaTimestamp = format((info, opts) => {
+    if (opts.tz)
+        info.timestamp = moment().tz(opts.tz).format('YYYY-MM-DDTHH:mm:ss.SSSSSSSSSZ')
+    return info
 })
+
+// -------------------------------------------------
+// Log Schema Format Constant
+const schemaFormat = printf(({ level, message, label, timestamp, service }) => {
+    return `{"label":"${label}","level":"${level}","msg":"${message}","service":"${service}","time":"${timestamp}}"`
+})
+
 
 const logger = (tagLabel) => createLogger({
     format: combine(
         label({ label: tagLabel }),
-        timestamp(),
-        schema
-        // format.json()
+        schemaTimestamp({ tz: 'Asia/Jakarta' }),
+        schemaFormat
     ),
     defaultMeta: { service: packageJson.name },
     transports: [
