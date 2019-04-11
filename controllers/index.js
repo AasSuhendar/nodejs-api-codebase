@@ -1,6 +1,6 @@
 const dbMongo = require('../database/mongoConnection')
 const dbMysql = require('../database/mysqlConnection')
-const config = require('../config').default
+const config = require('../config')
 const auth = require('../helpers/auth-jwt')
 
 const getIndex = async (req, res) => {
@@ -12,11 +12,15 @@ const getIndex = async (req, res) => {
 }
 
 const getSecure = async (req, res) => {
-    let dataClaims = auth.getClaims(res.get('X-JWT-Claims'))
+    if (!res.get('X-JWT-Claims')) {
+        return
+    }
+    
+    let dataClaims = await auth.getClaims(res.get('X-JWT-Claims'))
     res.send({
         status: true,
         statusCode: 200,
-        msg: 'Wellcome to secure api ' + dataClaims.data.user
+        msg: 'Wellcome to secure api ' + dataClaims.data.email
     })
 }
 

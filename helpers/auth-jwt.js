@@ -4,18 +4,15 @@ const jwt = require('jsonwebtoken')
 const response = require('../helpers/response')
 const crypt = require('../helpers/crypt')
 const Logger = require('../helpers/logger')
-
-
-// const private_key = env.private_key
-// const public_key = env.public_key
+const config = require('../config')
 
 const jwtOptions = {
-    expiresIn: '1h',
+    expiresIn: config.schema.get('jwt.expired'),
     algorithm: 'RS256'
 }
-// -------------------------------------------------
+
 // Auth JWT Middleware Function
-function AuthenticateJWT(req, res, next) {
+async function AuthenticateJWT(req, res, next) {
     // Check HTTP Header Authorization Section
     // The First Authorization Section Should Contain "Bearer "
     if (!req.headers.authorization || req.headers.authorization.indexOf('Bearer ') === -1) {
@@ -26,25 +23,34 @@ function AuthenticateJWT(req, res, next) {
 
     // The Second Authorization Section Should Be The Credentials Payload
     let authPayload = req.headers.authorization.split(' ')[1]
-
+    
     // Get Authorization Claims From JWT Token
-    // And Stringify Data to JSON Format
-    let authClaims = JSON.stringify(jwt.verify(authPayload, crypt.keyPublic, jwtOptions))
-    // Set Extracted Authorization Claims to HTTP Header
-    // With RSA Encryption
-    res.set('X-JWT-Claims', crypt.encryptWithRSA(authClaims))
+    await jwt.verify(authPayload, crypt.keyPublic, jwtOptions, (err,decoded) => {
+        if (err) {
+            Logger.logger('http-access').error('Unauthorized Method ' + req.method + ' at URI ' + req.url)
+            return res.status(401).send({
+                success: false,
+                status: 401,
+                code: 'AUTH-FAILED',
+                msg: err.message
+            })
+        } else {
+            // And Stringify Data
+            // Set Extracted Authorization Claims to HTTP Header
+            // With RSA Encryption
+            res.set('X-JWT-Claims', crypt.encryptWithRSA(JSON.stringify(decoded)))
+        }
+    })
+    
     // Call Next Handler Function With Current Request
     next()
 }
 
-// -------------------------------------------------
 // Get JWT Token Function
 function getToken(payload) {
     return jwt.sign({ data: payload }, crypt.keyPrivate, jwtOptions)
 }
 
-
-// -------------------------------------------------
 // Get JWT Claims Function
 function getClaims(data) {
     return JSON.parse(crypt.decryptWithRSA(data))

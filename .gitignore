@@ -29,7 +29,6 @@ node_modules
 
 # Debug log from npm
 npm-debug.log
-
 cypress.json
 cucumber.js
 junit.xml

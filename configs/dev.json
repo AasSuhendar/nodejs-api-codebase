@@ -2,7 +2,7 @@
     "env": "dev",
     "server": {
         "address": "0.0.0.0",
-        // "port": 0,
+        "port": 3000,
         "upload": {
             "path": "./uploaded"
         }
@@ -15,21 +15,21 @@
     },
     "db": {
         "driver": "",
-        "host": "",
+        "host": "0.0.0.0",
         "port": 0,
         "username": "",
         "password": "",
         "name": ""
     },
     "store": {
-        "driver": "minio",
+        "driver": "",
         "accessKey": "",
         "secretKey": "",
         "bucket": ""
     },
     "event": {
-        "driver": "kafka",
+        "driver": "",
         "host": "0.0.0.0",
-        "port": 9092
+        "port": 0
     }
 }

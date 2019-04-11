@@ -1,8 +1,9 @@
 const env = require('dotenv')
 const convict = require('convict')
 
-// -------------------------------------------------
-// Configuration Schema Constant
+env.config()
+
+// Configuration Schema
 const schema = convict({
     env: {
         doc: 'The Application Environment',
@@ -161,10 +162,6 @@ const schema = convict({
 schema.loadFile('./configs/' + schema.get('env') + '.json')
 schema.validate({ allowed: 'strict' })
 
-env.config()
-
-// -------------------------------------------------
-// Export Module
 module.exports = {
     schema
 }

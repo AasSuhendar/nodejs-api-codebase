@@ -1,5 +1,4 @@
 const mongoose = require('mongoose')
-const env = require('../configs/env')
 const config = require('../config')
 const Logger = require('../helpers/logger')
 
@@ -23,7 +22,6 @@ const cleanUpConnection = async () => {
 const createMongoConnection = () => {
 
     let dbURI
-    console.log(config.schema.get('db.port'));
     
     if (config.schema.get('db.username') == '' || config.schema.get('db.password') == '' || config.schema.get('db.name') == '') {
         dbURI = 'mongodb://' + config.schema.get('db.host') + ':' + config.schema.get('db.port')
@@ -34,7 +32,6 @@ const createMongoConnection = () => {
         dbURI = 'mongodb://' + config.schema.get('db.username') + ':' + config.schema.get('db.password') + '@' +
             config.schema.get('db.host') + ':' + config.schema.get('db.port') + '/' + config.schema.get('db.name')
     }
-    console.log(dbURI);
     
     mongoose.connect(dbURI, {
         useNewUrlParser: true,

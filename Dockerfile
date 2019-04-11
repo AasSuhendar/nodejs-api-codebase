@@ -25,8 +25,7 @@ ADD . /usr/src/app
 #   && mv /usr/src/node_modules /usr/src/app/ \
 
 # setting pm2 
-RUN rm -rf node_modules \
-  && mv /usr/src/node_modules /usr/src/app/ \
+RUN rm -rf /tmp/node_modules \
   && mkdir -p /.pm2 \
   && chown -R user:root /.pm2 \
   && chmod 775 /.pm2 \
@@ -40,7 +39,7 @@ EXPOSE 3000
 # CMD ["npm","start"]
 
 # Healthcheck
-HEALTHCHECK --interval=3s --timeout=3s CMD ["curl", "http://127.0.0.1:3000/health"] || exit 1
+HEALTHCHECK --interval=5s --timeout=3s CMD ["curl", "http://127.0.0.1:3000/health"] || exit 1
 
 # Mounting Volume
 VOLUME ["/usr/src/app/uploaded"]

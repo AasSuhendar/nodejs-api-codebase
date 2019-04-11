@@ -47,5 +47,5 @@ const consumerEventNotif = async () => {
 
 module.exports = {
     consumerEvent,
-    // consumerEventNotif
+    consumerEventNotif
 }
