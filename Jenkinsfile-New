@@ -9,7 +9,7 @@ pipeline {
         string(name: 'VSAN_REGISTRY_URL',          description: ' Openshift registry URL',              defaultValue: '') // docker-registry-default.vsan-apps.sample.id
         string(name: 'DELL_REGISTRY_URL',          description: ' Openshift registry URL',              defaultValue: '') // docker-registry-default.apps.sample.id
 
-        string(name: 'DOCKER_IMAGE_NAME',          description: 'Docker Image Name',                    defaultValue: 'codebase-ap') // codebase-api
+        string(name: 'DOCKER_IMAGE_NAME',          description: 'Docker Image Name',                    defaultValue: 'codebase-api') // codebase-api
 
         string(name: 'CHAT_ID',                    description: 'Chat ID of Telegram Group',            defaultValue: '') //-383243277  
     }
@@ -123,6 +123,7 @@ pipeline {
                 sh "docker build --rm -t ${params.DOCKER_IMAGE_NAME}:${BUILD_NUMBER}-${COMMIT_ID} ."
                 sh "docker run -d -p 3000:3000 --name ${params.DOCKER_IMAGE_NAME} ${params.DOCKER_IMAGE_NAME}:${BUILD_NUMBER}-${COMMIT_ID}"
                 sh "netstat -antp"
+                sh "curl -vkl http://127.0.0.1:3000"
                 sh "docker exec ${params.DOCKER_IMAGE_NAME} ls -alh"
                 sh "docker stop ${params.DOCKER_IMAGE_NAME}"
                 sh "docker rm ${params.DOCKER_IMAGE_NAME}"
