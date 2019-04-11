@@ -1,4 +1,5 @@
 def COMMIT_ID
+def response
 
 pipeline {
     parameters {
@@ -124,7 +125,7 @@ pipeline {
                 sh "docker run -d -p 3000:3000 --name ${params.DOCKER_IMAGE_NAME} ${params.DOCKER_IMAGE_NAME}:${BUILD_NUMBER}-${COMMIT_ID}"
                 sh "docker ps -a"
                 sh "netstat -antp"
-                def response = sh(
+                response = sh(
                     returnStdout: true, 
                     script: "curl -vkl http:127.0.0.1:3000"
                 )
