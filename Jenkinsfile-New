@@ -126,7 +126,7 @@ pipeline {
             agent { label "agent-docker" }
             steps {
                 unstash 'ws'
-                sh "docker build --rm -t ${params.DOCKER_IMAGE_NAME}:${BUILD_NUMBER}-${COMMIT_ID} ./"
+                sh "docker build --rm -t ${params.DOCKER_IMAGE_NAME}:${BUILD_NUMBER}-${COMMIT_ID} '.'"
             }
         }
         stage('Deployment') {
