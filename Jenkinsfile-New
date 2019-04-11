@@ -49,8 +49,6 @@ pipeline {
                         script{
                             sh "npm install"
                         }
-                        // stash this current workspace
-                        stash(name: 'workspace-full', includes:'**')
                     }
                 }
                 stage("Agent Jenkis: Docker") {
@@ -121,8 +119,12 @@ pipeline {
             }
             agent { label "agent-docker" }
             steps {
-                unstash 'workspace-full'
+                unstash 'workspace-basic'
                 sh "docker build --rm -t ${params.DOCKER_IMAGE_NAME}:${BUILD_NUMBER}-${COMMIT_ID} . "
+                sh "docker run -n ${params.DOCKER_IMAGE_NAME} ${params.DOCKER_IMAGE_NAME}:${BUILD_NUMBER}-${COMMIT_ID}"
+                sh "docker exec ${params.DOCKER_IMAGE_NAME} ls -alh"
+                sh "docker stop ${params.DOCKER_IMAGE_NAME}"
+                sh "docker rm ${params.DOCKER_IMAGE_NAME}"
             }
         }
         stage('Deployment') {
