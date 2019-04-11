@@ -31,10 +31,12 @@ pipeline {
                     echo "get COMMIT_ID"
                     sh 'echo -n $(git rev-parse --short HEAD) > ./commit-id'
                     commitId = readFile('./commit-id')
+
                     COMMIT_ID = sh(
                         returnStdout : true,
                         script : "git rev-parse --short HEAD"
                     )
+
                     echo COMMIT_ID
                 }
                 // stash this current workspace
@@ -45,12 +47,13 @@ pipeline {
             parallel {
                 stage("Agent Jenkins: Node Go") {
                     agent { label "agent-node-go" }
-                    echo COMMIT_ID
+                    
                     steps {
                         cleanWs()
                         unstash 'ws'
                         script{
                             sh "npm install"
+                            echo COMMIT_ID
                         }
                         stash(name: 'package', includes:'**')
                     }
