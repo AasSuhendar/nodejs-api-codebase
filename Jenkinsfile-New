@@ -105,7 +105,7 @@ pipeline {
             }
             agent { label "agent-node-go" }
             steps {
-                unstash 'ws'
+                // unstash 'ws'
                 echo "Run SonarQube"
                 script {
                     echo "defining sonar-scanner"
@@ -126,7 +126,7 @@ pipeline {
             }
             agent { label "agent-docker" }
             steps {
-                // unstash 'ws'
+                unstash 'ws'
                 sh 'ls -alh'
                 sh "docker build --rm -t ${params.DOCKER_IMAGE_NAME}:${BUILD_NUMBER}-${COMMIT_ID} . "
             }
@@ -166,7 +166,7 @@ pipeline {
                 // }
                 stage ('Deploy'){
                     steps{
-                        unstash 'ws'
+                        // unstash 'ws'
                         echo "In this stage try to deploy image to prod"
                         //vars envStage, ProjectName and imageNameFinal is from previous deployment stage (re-tagin image)
                         // script{
