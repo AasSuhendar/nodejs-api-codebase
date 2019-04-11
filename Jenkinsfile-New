@@ -11,9 +11,9 @@ pipeline {
 
         string(name: 'CHAT_ID',                    description: 'Chat ID of Telegram Group',            defaultValue: '') //-383243277  
     }
-    environment{
-        telegram = credentials('telegram-token')
-    }
+    // environment{
+    //     telegram = credentials('telegram-token')
+    // }
     agent none
     options {
         // Skip default checkout behavior
