@@ -37,7 +37,7 @@ pipeline {
                     sh "ls -alh"
                 }
                 // stash this current workspace
-                stash(name: 'ws', includes:'**,./commit-id')
+                stash(name: 'ws', includes:'**')
             }
         }
         stage('Initialize') {
@@ -47,7 +47,7 @@ pipeline {
                     
                     steps {
                         cleanWs()
-                        // unstash 'ws'
+                        unstash 'ws'
                         script{
                             sh "ls -alh"
                             sh "npm install"
@@ -90,6 +90,7 @@ pipeline {
             steps {
                 // unstash 'ws'
                 script{
+                    sh "ls -alh"
                     sh "npm test"
                 }
             }    
