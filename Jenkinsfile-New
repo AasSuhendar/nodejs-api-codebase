@@ -29,15 +29,12 @@ pipeline {
                 checkout scm
                 script {
                     echo "get COMMIT_ID"
-                    sh 'echo -n $(git rev-parse --short HEAD) > ./commit-id'
-                    commitId = readFile('./commit-id')
 
                     COMMIT_ID = sh(
                         returnStdout : true,
                         script : "git rev-parse --short HEAD"
                     )
 
-                    echo COMMIT_ID
                 }
                 // stash this current workspace
                 stash(name: 'ws', includes:'**,./commit-id')
@@ -63,6 +60,7 @@ pipeline {
                     steps {
                         cleanWs()
                         script{
+                            echo COMMIT_ID
                             // Setup variable for retagging purpose
                             if ( env.BRANCH_NAME == 'master' ){
                                 projectName =  "${params.PRODUCTION_NAMESPACE}"
@@ -128,7 +126,7 @@ pipeline {
             agent { label "agent-docker" }
             steps {
                 unstash 'ws'
-                sh "docker build --rm -t ${params.DOCKER_IMAGE_NAME}:${BUILD_NUMBER}-${commitId} ."
+                sh "docker build --rm -t ${params.DOCKER_IMAGE_NAME}:${BUILD_NUMBER}-${COMMIT_ID} ."
             }
         }
         stage('Deployment') {
@@ -160,7 +158,7 @@ pipeline {
                 // stage ('Re-tag Image'){
                 //     steps{
                 //         echo "Retaging Image"
-                //         sh "docker tag ${params.DOCKER_IMAGE_NAME}:${BUILD_NUMBER}-${commitId}\
+                //         sh "docker tag ${params.DOCKER_IMAGE_NAME}:${BUILD_NUMBER}-${COMMIT_ID}\
                 //                     ${imageNameFinal}:latest"
                 //     }
                 // }
@@ -178,10 +176,10 @@ pipeline {
                             //     echo "Deploying to ${envStage} (${projectName})"
                             //     sh "docker push ${imageNameFinal}:latest"
 
-				            //     // push image with commitId tag
-				            //     sh "docker tag ${imageNameFinal}:latest ${imageNameFinal}:${commitId}"
-                            //     sh "docker push ${imageNameFinal}:${commitId}"
-				            //     sh "docker rmi -f ${imageNameFinal}:${commitId}"
+				            //     // push image with COMMIT_ID tag
+				            //     sh "docker tag ${imageNameFinal}:latest ${imageNameFinal}:${COMMIT_ID}"
+                            //     sh "docker push ${imageNameFinal}:${COMMIT_ID}"
+				            //     sh "docker rmi -f ${imageNameFinal}:${COMMIT_ID}"
 
                             // } else{
                             //     echo "Deploying to ${envStage} (${projectName})"
@@ -189,7 +187,8 @@ pipeline {
                             // }
                         // }
                         echo "CleanUp Images"
-                        sh "docker rmi -f ${params.DOCKER_IMAGE_NAME}:${BUILD_NUMBER}-${commitId}"
+                        sh "docker rmi -f ${params.DOCKER_IMAGE_NAME}:${BUILD_NUMBER}-${COMMIT_ID}"
+                        echo COMMIT_ID
                         // sh "docker rmi -f ${imageNameFinal}"
 
                     }
@@ -204,7 +203,7 @@ pipeline {
                 // script{
                 //     withCredentials([string(credentialsId: 'telegram-token', variable: 'TELEGRAM_TOKEN')]) {
                 //         if  (BRANCH_NAME == 'master' || BRANCH_NAME == 'release' || BRANCH_NAME == 'develop'){
-                //             textMessage = "(╥﹏╥) Jenkins Job --- ${JOB_NAME}-${BUILD_NUMBER}-${commitId} is FAILED , Please check ${BUILD_URL}console"
+                //             textMessage = "(╥﹏╥) Jenkins Job --- ${JOB_NAME}-${BUILD_NUMBER}-${COMMIT_ID} is FAILED , Please check ${BUILD_URL}console"
                 //             sh "curl -s -X POST 'https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage?chat_id=${params.CHAT_ID}&text=${textMessage}'"
                 //         }
                 //     }
@@ -218,7 +217,7 @@ pipeline {
                 // script{
                 //     withCredentials([string(credentialsId: 'telegram-token', variable: 'TELEGRAM_TOKEN')]) {
                 //         if  (BRANCH_NAME == 'master' || BRANCH_NAME == 'release' || BRANCH_NAME == 'develop'){
-                //             textMessage = "҉\\(•˘▽˘•)/҉   Jenkins Job --- ${JOB_NAME}-${BUILD_NUMBER}-${commitId} is SUCCESS"
+                //             textMessage = "҉\\(•˘▽˘•)/҉   Jenkins Job --- ${JOB_NAME}-${BUILD_NUMBER}-${COMMIT_ID} is SUCCESS"
                 //             sh "curl -s -X POST 'https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage?chat_id=${params.CHAT_ID}&text=${textMessage}'"
                 //         }
                 //     }
