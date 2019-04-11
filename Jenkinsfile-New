@@ -1,3 +1,5 @@
+def COMMIT_ID = ""
+
 pipeline {
     parameters {
         string(name: 'PRODUCTION_NAMESPACE',       description: 'Production Namespace',                 defaultValue: '')
@@ -14,6 +16,7 @@ pipeline {
     // environment{
     //     telegram = credentials('telegram-token')
     // }
+    
     agent none
     options {
         // Skip default checkout behavior
@@ -24,11 +27,15 @@ pipeline {
             agent { label "agent-node-go" }
             steps {
                 checkout scm
-
+                COMMIT_ID = sh(
+                    returnStdout:true,
+                    script: 'echo -n $(git rev-parse --short HEAD)'
+                )
                 script {
                     echo "get COMMIT_ID"
                     sh 'echo -n $(git rev-parse --short HEAD) > ./commit-id'
                     commitId = readFile('./commit-id')
+
                 }
                 // stash this current workspace
                 stash(name: 'ws', includes:'**,./commit-id')
@@ -38,12 +45,14 @@ pipeline {
             parallel {
                 stage("Agent Jenkins: Node Go") {
                     agent { label "agent-node-go" }
+                    echo COMMIT_ID
                     steps {
                         cleanWs()
                         unstash 'ws'
                         script{
                             sh "npm install"
                         }
+                        stash(name: 'package', includes:'**')
                     }
                 }
                 stage("Agent Jenkis: Docker") {
@@ -78,7 +87,7 @@ pipeline {
         stage('Testing Stage') {
             agent { label "agent-node-go" }
             steps {
-                unstash 'ws'
+                // unstash 'ws'
                 script{
                     sh "npm test"
                 }
