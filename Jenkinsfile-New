@@ -34,7 +34,7 @@ pipeline {
                         returnStdout : true,
                         script : "git rev-parse --short HEAD"
                     ).trim()
-
+                    sh "ls -alh"
                 }
                 // stash this current workspace
                 stash(name: 'ws', includes:'**,./commit-id')
@@ -47,10 +47,10 @@ pipeline {
                     
                     steps {
                         cleanWs()
-                        unstash 'ws'
+                        // unstash 'ws'
                         script{
+                            sh "ls -alh"
                             sh "npm install"
-                            echo COMMIT_ID
                         }
                         stash(name: 'package', includes:'**')
                     }
@@ -125,7 +125,7 @@ pipeline {
             }
             agent { label "agent-docker" }
             steps {
-                unstash 'ws'
+                // unstash 'ws'
                 sh 'ls -alh'
                 sh "docker build --rm -t ${params.DOCKER_IMAGE_NAME}:${BUILD_NUMBER}-${COMMIT_ID} . "
             }
