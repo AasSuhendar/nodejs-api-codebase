@@ -29,7 +29,7 @@ pipeline {
                 checkout scm
                 COMMIT_ID = sh(
                     returnStdout : true,
-                    script: "echo -n $(git rev-parse --short HEAD)"
+                    script : "echo -n git rev-parse --short HEAD"
                 )
                 script {
                     echo "get COMMIT_ID"
