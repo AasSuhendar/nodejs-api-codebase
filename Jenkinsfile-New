@@ -122,6 +122,7 @@ pipeline {
                 unstash 'workspace-basic'
                 sh "docker build --rm -t ${params.DOCKER_IMAGE_NAME}:${BUILD_NUMBER}-${COMMIT_ID} . "
                 sh "docker run -d --name ${params.DOCKER_IMAGE_NAME} ${params.DOCKER_IMAGE_NAME}:${BUILD_NUMBER}-${COMMIT_ID}"
+                sh "curl -vkl http://localhost:3000"
                 sh "docker exec ${params.DOCKER_IMAGE_NAME} ls -alh"
                 sh "docker stop ${params.DOCKER_IMAGE_NAME}"
                 sh "docker rm ${params.DOCKER_IMAGE_NAME}"
