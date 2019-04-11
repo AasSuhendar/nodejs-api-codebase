@@ -156,7 +156,7 @@ pipeline {
                         unstash 'ws'
                         echo "In this stage try to deploy image to prod"
                         //vars envStage, ProjectName and imageNameFinal is from previous deployment stage (re-tagin image)
-                        script{
+                        // script{
                             // this step will be hold until deployment confirmed
                             // if (env.BRANCH_NAME == 'master'){
                             //     timeout(10) {
@@ -174,7 +174,7 @@ pipeline {
                             //     echo "Deploying to ${envStage} (${projectName})"
                             //     sh "docker push ${imageNameFinal}:latest"
                             // }
-                        }
+                        // }
                         echo "CleanUp Images"
                         sh "docker rmi -f ${params.DOCKER_IMAGE_NAME}:${BUILD_NUMBER}-${commitId}"
                         sh "docker rmi -f ${imageNameFinal}"
