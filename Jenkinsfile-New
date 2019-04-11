@@ -29,15 +29,13 @@ pipeline {
                 checkout scm
                 script {
                     echo "get COMMIT_ID"
-
                     COMMIT_ID = sh(
                         returnStdout : true,
                         script : "git rev-parse --short HEAD"
                     ).trim()
-                    sh "ls -alh"
                 }
                 // stash this current workspace
-                stash(name: 'ws', includes:'**')
+                stash(name: 'workspace-basic', includes:'**')
             }
         }
         stage('Initialize') {
@@ -47,12 +45,12 @@ pipeline {
                     
                     steps {
                         cleanWs()
-                        unstash 'ws'
+                        unstash 'workspace-basic'
                         script{
-                            sh "ls -alh"
                             sh "npm install"
                         }
-                        stash(name: 'package', includes:'**')
+                        // stash this current workspace
+                        stash(name: 'workspace-full', includes:'**')
                     }
                 }
                 stage("Agent Jenkis: Docker") {
@@ -60,7 +58,6 @@ pipeline {
                     steps {
                         cleanWs()
                         script{
-                            echo COMMIT_ID
                             // Setup variable for retagging purpose
                             if ( env.BRANCH_NAME == 'master' ){
                                 projectName =  "${params.PRODUCTION_NAMESPACE}"
@@ -88,7 +85,6 @@ pipeline {
         stage('Testing Stage') {
             agent { label "agent-node-go" }
             steps {
-                // unstash 'ws'
                 script{
                     sh "ls -alh"
                     sh "npm test"
@@ -105,7 +101,6 @@ pipeline {
             }
             agent { label "agent-node-go" }
             steps {
-                // unstash 'ws'
                 echo "Run SonarQube"
                 script {
                     echo "defining sonar-scanner"
@@ -126,8 +121,7 @@ pipeline {
             }
             agent { label "agent-docker" }
             steps {
-                unstash 'ws'
-                sh 'ls -alh'
+                unstash 'workspace-full'
                 sh "docker build --rm -t ${params.DOCKER_IMAGE_NAME}:${BUILD_NUMBER}-${COMMIT_ID} . "
             }
         }
@@ -190,7 +184,6 @@ pipeline {
                         // }
                         echo "CleanUp Images"
                         sh "docker rmi -f ${params.DOCKER_IMAGE_NAME}:${BUILD_NUMBER}-${COMMIT_ID}"
-                        echo COMMIT_ID
                         // sh "docker rmi -f ${imageNameFinal}"
 
                     }
