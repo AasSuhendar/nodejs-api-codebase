@@ -27,15 +27,15 @@ pipeline {
             agent { label "agent-node-go" }
             steps {
                 checkout scm
-                COMMIT_ID = sh(
-                    returnStdout : true,
-                    script : "echo -n git rev-parse --short HEAD"
-                )
                 script {
                     echo "get COMMIT_ID"
                     sh 'echo -n $(git rev-parse --short HEAD) > ./commit-id'
                     commitId = readFile('./commit-id')
-
+                    COMMIT_ID = sh(
+                        returnStdout : true,
+                        script : "git rev-parse --short HEAD"
+                    )
+                    echo COMMIT_ID
                 }
                 // stash this current workspace
                 stash(name: 'ws', includes:'**,./commit-id')
