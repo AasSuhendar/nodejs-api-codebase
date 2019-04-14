@@ -1,3 +1,6 @@
+def COMMIT_ID
+def RESPONSE
+
 pipeline {
     parameters {
         string(name: 'PRODUCTION_NAMESPACE',       description: 'Production Namespace',                 defaultValue: '')
@@ -7,13 +10,14 @@ pipeline {
         string(name: 'VSAN_REGISTRY_URL',          description: ' Openshift registry URL',              defaultValue: '') // docker-registry-default.vsan-apps.sample.id
         string(name: 'DELL_REGISTRY_URL',          description: ' Openshift registry URL',              defaultValue: '') // docker-registry-default.apps.sample.id
 
-        string(name: 'DOCKER_IMAGE_NAME',          description: 'Docker Image Name',                    defaultValue: 'codebase-ap') // codebase-api
+        string(name: 'DOCKER_IMAGE_NAME',          description: 'Docker Image Name',                    defaultValue: 'codebase-api') // codebase-api
 
         string(name: 'CHAT_ID',                    description: 'Chat ID of Telegram Group',            defaultValue: '') //-383243277  
     }
-    environment{
-        telegram = credentials('telegram-token')
-    }
+    // environment{
+    //     telegram = credentials('telegram-token')
+    // }
+    
     agent none
     options {
         // Skip default checkout behavior
@@ -24,23 +28,25 @@ pipeline {
             agent { label "agent-node-go" }
             steps {
                 checkout scm
-
                 script {
                     echo "get COMMIT_ID"
-                    sh 'echo -n $(git rev-parse --short HEAD) > ./commit-id'
-                    commitId = readFile('./commit-id')
+                    COMMIT_ID = sh(
+                        returnStdout : true,
+                        script : "git rev-parse --short HEAD"
+                    ).trim()
                 }
                 // stash this current workspace
-                stash(name: 'ws', includes:'**,./commit-id')
+                stash(name: 'workspace-basic', includes:'**')
             }
         }
         stage('Initialize') {
             parallel {
                 stage("Agent Jenkins: Node Go") {
                     agent { label "agent-node-go" }
+                    
                     steps {
                         cleanWs()
-                        unstash 'ws'
+                        unstash 'workspace-basic'
                         script{
                             sh "npm install"
                         }
@@ -69,7 +75,7 @@ pipeline {
                             }
 
                             // Defind for Final image name
-                            imageNameFinal = "${registryURL}/${projectName}/${params.DOCKER_IMAGE_NAME}"
+                            // imageNameFinal = "${registryURL}/${projectName}/${params.DOCKER_IMAGE_NAME}"
                         }
                     }
                 }
@@ -78,8 +84,8 @@ pipeline {
         stage('Testing Stage') {
             agent { label "agent-node-go" }
             steps {
-                unstash 'ws'
                 script{
+                    sh "ls -alh"
                     sh "npm test"
                 }
             }    
@@ -94,7 +100,6 @@ pipeline {
             }
             agent { label "agent-node-go" }
             steps {
-                unstash 'ws'
                 echo "Run SonarQube"
                 script {
                     echo "defining sonar-scanner"
@@ -115,8 +120,16 @@ pipeline {
             }
             agent { label "agent-docker" }
             steps {
-                unstash 'ws'
-                sh "docker build --rm -t ${params.DOCKER_IMAGE_NAME}:${BUILD_NUMBER}-${commitId} ."
+                script{
+                    unstash 'workspace-basic'
+                    sh "docker build --rm -t ${params.DOCKER_IMAGE_NAME}:${BUILD_NUMBER}-${COMMIT_ID} ."
+                    sh "docker run -d -p 3000:3000 --name ${params.DOCKER_IMAGE_NAME} ${params.DOCKER_IMAGE_NAME}:${BUILD_NUMBER}-${COMMIT_ID}"
+                    sh "docker ps -a"
+                    sh "netstat -antp"
+                    sh "docker exec ${params.DOCKER_IMAGE_NAME} ls -alh"
+                    sh "docker stop ${params.DOCKER_IMAGE_NAME}"
+                    sh "docker rm ${params.DOCKER_IMAGE_NAME}"
+                }
             }
         }
         stage('Deployment') {
@@ -145,18 +158,19 @@ pipeline {
                         // }
                     }
                 }
-                stage ('Re-tag Image'){
-                    steps{
-                        echo "Retaging Image"
-                        sh "docker tag ${params.DOCKER_IMAGE_NAME}:${BUILD_NUMBER}-${commitId}\${imageNameFinal}:latest"
-                    }
-                }
+                // stage ('Re-tag Image'){
+                //     steps{
+                //         echo "Retaging Image"
+                //         sh "docker tag ${params.DOCKER_IMAGE_NAME}:${BUILD_NUMBER}-${COMMIT_ID}\
+                //                     ${imageNameFinal}:latest"
+                //     }
+                // }
                 stage ('Deploy'){
                     steps{
-                        unstash 'ws'
+                        // unstash 'ws'
                         echo "In this stage try to deploy image to prod"
                         //vars envStage, ProjectName and imageNameFinal is from previous deployment stage (re-tagin image)
-                        script{
+                        // script{
                             // this step will be hold until deployment confirmed
                             // if (env.BRANCH_NAME == 'master'){
                             //     timeout(10) {
@@ -165,19 +179,19 @@ pipeline {
                             //     echo "Deploying to ${envStage} (${projectName})"
                             //     sh "docker push ${imageNameFinal}:latest"
 
-				            //     // push image with commitId tag
-				            //     sh "docker tag ${imageNameFinal}:latest ${imageNameFinal}:${commitId}"
-                            //     sh "docker push ${imageNameFinal}:${commitId}"
-				            //     sh "docker rmi -f ${imageNameFinal}:${commitId}"
+				            //     // push image with COMMIT_ID tag
+				            //     sh "docker tag ${imageNameFinal}:latest ${imageNameFinal}:${COMMIT_ID}"
+                            //     sh "docker push ${imageNameFinal}:${COMMIT_ID}"
+				            //     sh "docker rmi -f ${imageNameFinal}:${COMMIT_ID}"
 
                             // } else{
                             //     echo "Deploying to ${envStage} (${projectName})"
                             //     sh "docker push ${imageNameFinal}:latest"
                             // }
-                        }
+                        // }
                         echo "CleanUp Images"
-                        sh "docker rmi -f ${params.DOCKER_IMAGE_NAME}:${BUILD_NUMBER}-${commitId}"
-                        sh "docker rmi -f ${imageNameFinal}"
+                        sh "docker rmi -f ${params.DOCKER_IMAGE_NAME}:${BUILD_NUMBER}-${COMMIT_ID}"
+                        // sh "docker rmi -f ${imageNameFinal}"
 
                     }
                 }
@@ -191,7 +205,7 @@ pipeline {
                 // script{
                 //     withCredentials([string(credentialsId: 'telegram-token', variable: 'TELEGRAM_TOKEN')]) {
                 //         if  (BRANCH_NAME == 'master' || BRANCH_NAME == 'release' || BRANCH_NAME == 'develop'){
-                //             textMessage = "(╥﹏╥) Jenkins Job --- ${JOB_NAME}-${BUILD_NUMBER}-${commitId} is FAILED , Please check ${BUILD_URL}console"
+                //             textMessage = "(╥﹏╥) Jenkins Job --- ${JOB_NAME}-${BUILD_NUMBER}-${COMMIT_ID} is FAILED , Please check ${BUILD_URL}console"
                 //             sh "curl -s -X POST 'https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage?chat_id=${params.CHAT_ID}&text=${textMessage}'"
                 //         }
                 //     }
@@ -205,7 +219,7 @@ pipeline {
                 // script{
                 //     withCredentials([string(credentialsId: 'telegram-token', variable: 'TELEGRAM_TOKEN')]) {
                 //         if  (BRANCH_NAME == 'master' || BRANCH_NAME == 'release' || BRANCH_NAME == 'develop'){
-                //             textMessage = "҉\\(•˘▽˘•)/҉   Jenkins Job --- ${JOB_NAME}-${BUILD_NUMBER}-${commitId} is SUCCESS"
+                //             textMessage = "҉\\(•˘▽˘•)/҉   Jenkins Job --- ${JOB_NAME}-${BUILD_NUMBER}-${COMMIT_ID} is SUCCESS"
                 //             sh "curl -s -X POST 'https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage?chat_id=${params.CHAT_ID}&text=${textMessage}'"
                 //         }
                 //     }
