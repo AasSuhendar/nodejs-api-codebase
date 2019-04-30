@@ -5,10 +5,10 @@ pipeline {
     parameters {
         string(name: 'PRODUCTION_NAMESPACE',       description: 'Production Namespace',                 defaultValue: '')
         string(name: 'STAGING_NAMESPACE',          description: 'Staging Namespace',                    defaultValue: '')
-        string(name: 'DEVELOPMENT_NAMESPACE',      description: 'Development Namespace',                defaultValue: '') // codebase-api-dev
+        string(name: 'DEVELOPMENT_NAMESPACE',      description: 'Development Namespace',                defaultValue: 'demoplaycourt') // codebase-api-dev
 
-        string(name: 'VSAN_REGISTRY_URL',          description: ' Openshift registry URL',              defaultValue: '') // docker-registry-default.vsan-apps.sample.id
-        string(name: 'DELL_REGISTRY_URL',          description: ' Openshift registry URL',              defaultValue: '') // docker-registry-default.apps.sample.id
+        // string(name: 'VSAN_REGISTRY_URL',          description: ' Openshift registry URL',              defaultValue: '') // docker-registry-default.vsan-apps.sample.id
+        string(name: 'DELL_REGISTRY_URL',          description: ' Openshift registry URL',              defaultValue: 'docker-registry-default.apps.playcourt.id') // docker-registry-default.apps.sample.id
 
         string(name: 'DOCKER_IMAGE_NAME',          description: 'Docker Image Name',                    defaultValue: 'codebase-api') // codebase-api
 
@@ -60,7 +60,7 @@ pipeline {
                             // Setup variable for retagging purpose
                             if ( env.BRANCH_NAME == 'master' ){
                                 projectName =  "${params.PRODUCTION_NAMESPACE}"
-                                registryURL = "${params.VSAN_REGISTRY_URL}"
+                                registryURL = "${params.DELL_REGISTRY_URL}"
                                 envStage = "Production"
 
                             } else if ( env.BRANCH_NAME == 'release' ){
@@ -145,50 +145,50 @@ pipeline {
                 stage("Login into registry") {
                     steps{
                         echo "In this stage try to connect internal registry"
-                        // script{
-                        //     if ( env.BRANCH_NAME == 'master'){
-                        //         withCredentials([string(credentialsId: 'VSAN_OC_REGISTRY_TOKEN', variable: 'TOKEN')]) {
-                        //             sh "docker login ${registryURL} -u jenkins -p ${TOKEN}"
-                        //         }
-                        //     } else {
-                        //         withCredentials([string(credentialsId: 'OC_REGISTRY_TOKEN', variable: 'TOKEN')]) {
-                        //             sh "docker login ${registryURL} -u jenkins -p ${TOKEN}"
-                        //         }
-                        //     }
-                        // }
+                        script{
+                            if ( env.BRANCH_NAME == 'master'){
+                                withCredentials([string(credentialsId: 'TOKEN_DELL', variable: 'TOKEN')]) {
+                                    sh "docker login ${registryURL} -u aassuhendar -p ${TOKEN}"
+                                }
+                            } else {
+                                withCredentials([string(credentialsId: 'TOKEN_DELL', variable: 'TOKEN')]) {
+                                    sh "docker login ${registryURL} -u aassuhendar -p ${TOKEN}"
+                                }
+                            }
+                        }
                     }
                 }
-                // stage ('Re-tag Image'){
-                //     steps{
-                //         echo "Retaging Image"
-                //         sh "docker tag ${params.DOCKER_IMAGE_NAME}:${BUILD_NUMBER}-${COMMIT_ID}\
-                //                     ${imageNameFinal}:latest"
-                //     }
-                // }
+                stage ('Re-tag Image'){
+                    steps{
+                        echo "Retaging Image"
+                        sh "docker tag ${params.DOCKER_IMAGE_NAME}:${BUILD_NUMBER}-${COMMIT_ID}\
+                                    ${imageNameFinal}:latest"
+                    }
+                }
                 stage ('Deploy'){
                     steps{
                         // unstash 'ws'
                         echo "In this stage try to deploy image to prod"
                         //vars envStage, ProjectName and imageNameFinal is from previous deployment stage (re-tagin image)
-                        // script{
+                        script{
                             // this step will be hold until deployment confirmed
-                            // if (env.BRANCH_NAME == 'master'){
-                            //     timeout(10) {
-                            //         input message: 'Deploy to PRODUCTION?', ok: 'Deploy'
-                            //     }
-                            //     echo "Deploying to ${envStage} (${projectName})"
-                            //     sh "docker push ${imageNameFinal}:latest"
+                            if (env.BRANCH_NAME == 'master'){
+                                timeout(10) {
+                                    input message: 'Deploy to PRODUCTION?', ok: 'Deploy'
+                                }
+                                echo "Deploying to ${envStage} (${projectName})"
+                                sh "docker push ${imageNameFinal}:latest"
 
-				            //     // push image with COMMIT_ID tag
-				            //     sh "docker tag ${imageNameFinal}:latest ${imageNameFinal}:${COMMIT_ID}"
-                            //     sh "docker push ${imageNameFinal}:${COMMIT_ID}"
-				            //     sh "docker rmi -f ${imageNameFinal}:${COMMIT_ID}"
+				                // push image with COMMIT_ID tag
+				                sh "docker tag ${imageNameFinal}:latest ${imageNameFinal}:${COMMIT_ID}"
+                                sh "docker push ${imageNameFinal}:${COMMIT_ID}"
+				                sh "docker rmi -f ${imageNameFinal}:${COMMIT_ID}"
 
-                            // } else{
-                            //     echo "Deploying to ${envStage} (${projectName})"
-                            //     sh "docker push ${imageNameFinal}:latest"
-                            // }
-                        // }
+                            } else{
+                                echo "Deploying to ${envStage} (${projectName})"
+                                sh "docker push ${imageNameFinal}:latest"
+                            }
+                        }
                         echo "CleanUp Images"
                         sh "docker rmi -f ${params.DOCKER_IMAGE_NAME}:${BUILD_NUMBER}-${COMMIT_ID}"
                         // sh "docker rmi -f ${imageNameFinal}"
