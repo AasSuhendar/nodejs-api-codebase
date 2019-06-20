@@ -7,12 +7,16 @@ const passport = require('passport')
 const bodyParser = require('body-parser')
 // const expressValidator = require('express-validator')
 const probe = require('kube-probe')
+const config = require('./config')
+
+const { createEventAdapter } = require('@slack/events-api')
+const slackSigningSecret = config.schema.get('slack.signing_secret')
+const slackEvents = createEventAdapter(slackSigningSecret)
 
 const swagger = require('./docs/swagger')
 const Response = require('./helpers/response')
 const Logger = require('./helpers/logger')
 const observerEvent = require('./event/observer')
-const config = require('./config')
 
 const dbMongo = require('./database/mongoConnection')
 const dbMysql = require('./database/mysqlConnection')
@@ -67,6 +71,17 @@ default:
     break
 }
 
+// Mount the event handler on a route
+// NOTE: you must mount to a path that matches the Request URL that was configured earlier
+app.use('/slack/events', slackEvents.expressMiddleware())
+
+// Attach listeners to events by Slack Event "type". See: https://api.slack.com/events/message.im
+slackEvents.on('message', (event)=> {
+    console.log(`Received a message event: user ${event.user} in channel ${event.channel} says ${event.text}`)
+})
+  
+// Handle errors (see `errorCodes` export)
+slackEvents.on('error', console.error)
 
 app.use(express.json())
 app.use(express.urlencoded({

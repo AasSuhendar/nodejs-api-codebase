@@ -156,6 +156,26 @@ const schema = convict({
             default: '',
             env: 'EVENT_PORT'
         },
+    },
+    slack: {
+        webhook_url: {
+            doc: 'Slack WebHook URL',
+            format: String,
+            default: '',
+            env: 'SLACK_WEBHOOK_URL'
+        },
+        client_secret: {
+            doc: 'Slack Event Host',
+            format: '*',
+            default: '',
+            env: 'SLACK_CLIENT_SECRET'
+        },
+        signing_secret: {
+            doc: 'Slack Signing Secret',
+            format: String,
+            default: '',
+            env: 'SLACK_SIGNING_SECRET'
+        },
     }
 })
 
