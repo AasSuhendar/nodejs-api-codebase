@@ -27,11 +27,23 @@ const authRouter = require('./routes/auth')
 const todosRouter = require('./routes/todos')
 const s3Router = require('./routes/s3')
 const userRouter = require('./routes/users')
+const elasticRouter = require('./routes/elastic')
 
 const app = express()
 app.use(cors())
 app.use(helmet())
 probe(app)
+
+// Add this to the VERY top of the first file loaded in your app
+require('elastic-apm-node').start({
+    // Override service name from package.json
+    // Allowed characters: a-z, A-Z, 0-9, -, _, and space
+    serviceName: 'nodejs-api-codebase',
+    // Use if APM Server requires a token
+    secretToken: '',
+    // Set custom APM Server URL (default: http://localhost:8200)
+    serverUrl: 'http://172.10.10.247:8200'
+})
 
 const producerConfig = {
     clientIdProducer:'KafkaProducer1',
@@ -111,6 +123,7 @@ app.use('/api/auth', authRouter)
 app.use('/api/todos', todosRouter)
 app.use('/api/s3', s3Router)
 app.use('/api/users', userRouter)
+app.use('/api/elastic', elasticRouter)
 app.use('/api/api-docs', swagger.swaggerUi.serve, swagger.swaggerUi.setup(swagger.swaggerSpec))
 
 
@@ -122,16 +135,9 @@ app.use(function (req, res) {
 })
 
 // error handler
-app.use(function (err, _req, res) {
+app.use(function (err, req, res) {
     Logger.logger('http-access').error(err)
     Response.failedResponse(res, 500, 'ERROR-SERVICES', 'Server Error')
 })
 
-
-// app.use((error, _req, res) => {
-//     const status = error.statusCode || 500
-//     const message = error.message
-//     const data = error.data
-//     Response.failedResponse(res, status, 'ERROR-SERVICES', 'Error Occured', { message: message, data: data })
-// })
 module.exports = app

@@ -1,7 +1,10 @@
 node_modules/
+covarage
+
 .env
 .vscode
 .sonarlint
 .nyc_output
 .DS_Store
+
 test-results.xml

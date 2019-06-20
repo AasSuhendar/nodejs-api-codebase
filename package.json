@@ -14,6 +14,7 @@
     "coverage": "nyc report --reporter=lcov --reporter=text-lcov"
   },
   "dependencies": {
+    "@elastic/elasticsearch": "^7.0.0-rc.2",
     "@slack/client": "^5.0.1",
     "@slack/events-api": "^2.2.0",
     "@slack/webhook": "^5.0.0",
@@ -29,6 +30,8 @@
     "debug": "~2.6.9",
     "dotenv": "^6.2.0",
     "dsn-parser": "^1.0.1",
+    "elastic-apm-node": "^2.10.0",
+    "elasticsearch": "^15.4.1",
     "express": "~4.16.0",
     "express-validator": "^5.3.1",
     "helmet": "^3.16.0",
@@ -51,7 +54,7 @@
     "request": "^2.88.0",
     "sequelize": "^4.43.1",
     "sinon": "^7.3.1",
-    "swagger-jsdoc": "^3.2.8",
+    "swagger-jsdoc": "^3.2.9",
     "swagger-ui-express": "^4.0.2",
     "uuid": "^3.3.2",
     "winston": "^3.2.1"
@@ -67,6 +70,6 @@
     "jest": "^24.7.1",
     "mocha": "^5.2.0",
     "mocha-junit-reporter": "^1.21.0",
-    "nyc": "^13.3.0"
+    "nyc": "^14.0.0"
   }
 }

@@ -1,47 +1,24 @@
-const AWS = require('aws-sdk')
 const Minio = require('minio')
 const config = require('../config')
-
-const s3AWSCreateConnection = () => {
-    let s3 = new AWS.S3({
-        accessKeyId: '',
-        secretAccessKey: '',
-        endpoint: 'http://127.0.0.1:9000',
-        s3ForcePathStyle: true, // needed with minio?
-        signatureVersion: 'v4'
-    })
-    return s3
-}
 
 const getS3Connection = () => {
     let s3connection
     switch (config.schema.get('store.driver')) {
-        case 'minio':
-            s3connection = new Minio.Client({
-                endPoint: config.schema.get('store.endPoint'),
-                port: config.schema.get('store.port'),
-                useSSL: config.schema.get('store.useSSL'),
-                accessKey: config.schema.get('store.accessKey'),
-                secretKey: config.schema.get('store.secretKey')
-            })
-            break;
-        
-        case 'aws':
-            break
-        default:
-            break;
+    case 'minio':
+        s3connection = new Minio.Client({
+            endPoint: config.schema.get('store.endPoint'),
+            port: config.schema.get('store.port'),
+            useSSL: config.schema.get('store.useSSL'),
+            accessKey: config.schema.get('store.accessKey'),
+            secretKey: config.schema.get('store.secretKey')
+        })
+        break
+    case 'aws':
+        break
+    default:
+        break
     }
     return s3connection
-}
-
-const getListBucketAWS =  async () =>{
-    let a = s3CreateConnection().listBuckets(function (err, data) {
-        if (err) {
-            console.log(err)
-        }
-        console.log(data)
-    })
-    return a
 }
 
 const getListBucketMinio = async () => {
@@ -69,7 +46,6 @@ const makeBucketMinio = async (bucketName) => {
 const listObject = async (bucketName) => {
     var stream = getS3Connection().listObjects(bucketName, '', true)
     var obj = await stream.on('data', function (obj) { return console.log(obj) })
-    console.log(obj);
     
     return obj
 }
@@ -85,8 +61,6 @@ const getDownloadObject = async (bucketName, fileName) => {
 }
 
 module.exports = {
-    s3AWSCreateConnection,
-    getListBucketAWS,
     getListBucketMinio,
     makeBucketMinio,
     listObject,
