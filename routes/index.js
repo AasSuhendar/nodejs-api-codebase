@@ -1,6 +1,7 @@
 const express = require('express')
 const router = express.Router()
 const IndexController = require('../controllers/index')
+const SlackController = require('../controllers/slack')
 const ProducerController = require('../controllers/producer')
 const auth = require('../helpers/auth-jwt')
 /**
@@ -69,5 +70,6 @@ router.get('/health', IndexController.healthCheck)
 router.get('/secure', auth.AuthenticateJWT, IndexController.getSecure)
 router.post('/sendMessage', ProducerController.sendMessage)
 router.post('/sendMessageMultiply', ProducerController.sendMessageMultiply)
+router.get('/sendNotifSlack', SlackController.postNotifSlack)
 
 module.exports = router
