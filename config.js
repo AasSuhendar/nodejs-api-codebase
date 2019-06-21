@@ -176,6 +176,32 @@ const schema = convict({
             default: '',
             env: 'SLACK_SIGNING_SECRET'
         },
+    },
+    elastic: {
+        apm_url: {
+            doc: 'APM URL',
+            format: String,
+            default: '',
+            env: 'APM_URL'
+        },
+        elastic_url: {
+            doc: 'Elasticsearch URL',
+            format: '*',
+            default: '',
+            env: 'ELASTIC_URL'
+        },
+        kibana_url: {
+            doc: 'Kibana URL',
+            format: String,
+            default: '',
+            env: 'KIBANA_URL'
+        },
+        logstash_url: {
+            doc: 'Logstash URL',
+            format: String,
+            default: '',
+            env: 'LOGSTASH_URL'
+        },
     }
 })
 

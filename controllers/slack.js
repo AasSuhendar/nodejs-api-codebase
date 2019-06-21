@@ -1,7 +1,6 @@
 const { IncomingWebhook } = require('@slack/webhook')
 const config = require('../config')
 const url = config.schema.get('slack.webhook_url')
-console.log(url)
 const webhook = new IncomingWebhook(url)
 const Response = require('../helpers/response')
 

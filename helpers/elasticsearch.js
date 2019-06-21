@@ -1,6 +1,7 @@
 const elasticsearch = require('elasticsearch')
+const config = require('../config')
 const client = new elasticsearch.Client({
-    host: 'http://172.10.10.247:9200',
+    host: config.schema.get('elastic.elastic_url'),
     // log: 'trace'
 })
 
@@ -9,7 +10,7 @@ client.ping({
     requestTimeout: 1000
 }, function (error) {
     if (error) {
-        console.trace('elasticsearch cluster is down!')
+        console.trace('Elasticsearch cluster is down!')
     } else {
         console.log('Elasticsearch. All is well')
     }

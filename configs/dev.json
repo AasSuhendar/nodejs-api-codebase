@@ -36,5 +36,11 @@
         "webhook_url":"",
         "client_secret": "",
         "signing_secret": ""
+    },
+    "elastic":{
+        "apm_url":"",
+        "elastic_url": "",
+        "kibana_url": "",
+        "logstash_url": ""
     }
 }

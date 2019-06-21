@@ -16,18 +16,22 @@ const slackEvents = createEventAdapter(slackSigningSecret)
 const swagger = require('./docs/swagger')
 const Response = require('./helpers/response')
 const Logger = require('./helpers/logger')
+
+// eslint-disable-next-line no-unused-vars
+const kafkaEvent = require('./helpers/event-kafka')
+// eslint-disable-next-line no-unused-vars
 const observerEvent = require('./event/observer')
 
 const dbMongo = require('./database/mongoConnection')
 const dbMysql = require('./database/mysqlConnection')
-const kafkaEvent = require('./helpers/event-kafka')
+
 
 const indexRouter = require('./routes/index')
 const authRouter = require('./routes/auth')
 const todosRouter = require('./routes/todos')
 const s3Router = require('./routes/s3')
 const userRouter = require('./routes/users')
-const elasticRouter = require('./routes/elastic')
+// const elasticRouter = require('./routes/elastic')
 
 const app = express()
 app.use(cors())
@@ -35,16 +39,17 @@ app.use(helmet())
 probe(app)
 
 // Add this to the VERY top of the first file loaded in your app
-require('elastic-apm-node').start({
-    // Override service name from package.json
-    // Allowed characters: a-z, A-Z, 0-9, -, _, and space
-    serviceName: 'nodejs-api-codebase',
-    // Use if APM Server requires a token
-    secretToken: '',
-    // Set custom APM Server URL (default: http://localhost:8200)
-    serverUrl: 'http://172.10.10.247:8200'
-})
+// require('elastic-apm-node').start({
+//     // Override service name from package.json
+//     // Allowed characters: a-z, A-Z, 0-9, -, _, and space
+//     serviceName: 'nodejs-api-codebase',
+//     // Use if APM Server requires a token
+//     secretToken: '',
+//     // Set custom APM Server URL (default: http://localhost:8200)
+//     serverUrl: config.schema.get('elastic.apm_url')
+// })
 
+// eslint-disable-next-line no-unused-vars
 const producerConfig = {
     clientIdProducer:'KafkaProducer1',
 }
@@ -123,7 +128,7 @@ app.use('/api/auth', authRouter)
 app.use('/api/todos', todosRouter)
 app.use('/api/s3', s3Router)
 app.use('/api/users', userRouter)
-app.use('/api/elastic', elasticRouter)
+// app.use('/api/elastic', elasticRouter)
 app.use('/api/api-docs', swagger.swaggerUi.serve, swagger.swaggerUi.setup(swagger.swaggerSpec))
 
 
