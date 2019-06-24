@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 const { Kafka, CompressionTypes, logLevel } = require('kafkajs')
 const config = require('../config')
 const Logger = require('../helpers/logger')
@@ -21,7 +22,6 @@ const runKafkaProducer = async ({clientIdProducer}) => {
             portBroker: config.schema.get('event.port'),
             clientId: clientIdProducer,
         }
-        console.log(option);
         
         // Witout Partitioner Setting
         producer = kafkaConnection(option).producer()
@@ -87,6 +87,7 @@ const disconnectKafka = async (mode,instance) => {
     })
 }
 
+// eslint-disable-next-line no-unused-vars
 const customPartitioner = () => {
     return ({ topic, partitionMetadata, message }) => {
         // select a partition based on some logic
