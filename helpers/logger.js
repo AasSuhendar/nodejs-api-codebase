@@ -1,12 +1,15 @@
 const { createLogger, format, transports } = require('winston')
 const { combine, label, printf} = format
 const moment = require('moment-timezone')
+var Elasticsearch = require('winston-elasticsearch')
 
 const dir = './logs'
 
 const config = require('../config')
 const packageJson = require('../package.json')
-
+var esTransportOpts = {
+    level: 'info'
+}
 // -------------------------------------------------
 // Log Schema Timestamp Constant
 const schemaTimestamp = format((info, opts) => {
@@ -46,7 +49,15 @@ const logger = (tagLabel) => createLogger({
             json: true,
             colorize: true,
             timestamp: true
-        })
+        }),
+        // new transports.Logstash({
+        //     port: process.env.LOGSTASH_PORT,
+        //     host: process.env.LOGSTASH_HOST,
+        //     node_name: 'my-api-node',
+        //     ssl_enable: false,
+        //     max_connect_retries: -1
+        // })
+        new Elasticsearch(esTransportOpts)
     ],
     exitOnError: false
 })

@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "@elastic/elasticsearch": "^7.0.0-rc.2",
+    "@log4js-node/logstashudp": "^1.2.0",
     "@slack/client": "^5.0.1",
     "@slack/events-api": "^2.2.0",
     "@slack/webhook": "^5.0.0",
@@ -40,6 +41,7 @@
     "jsonwebtoken": "^8.5.1",
     "kafkajs": "^1.6.0",
     "kube-probe": "^0.3.2",
+    "log4js": "^5.1.0",
     "minio": "^7.0.5",
     "moment-timezone": "^0.5.23",
     "mongoose": "^5.5.0",
@@ -52,12 +54,13 @@
     "passport-jwt": "^4.0.0",
     "passport-local": "^1.0.0",
     "request": "^2.88.0",
-    "sequelize": "^5.3.0",
+    "sequelize": "^5.18.0",
     "sinon": "^7.3.1",
     "swagger-jsdoc": "^3.2.9",
     "swagger-ui-express": "^4.0.2",
     "uuid": "^3.3.2",
-    "winston": "^3.2.1"
+    "winston": "^3.2.1",
+    "winston-elasticsearch": "^0.7.13"
   },
   "devDependencies": {
     "chai": "^4.2.0",

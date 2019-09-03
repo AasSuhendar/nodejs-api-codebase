@@ -1,4 +1,3 @@
-const env = require('../configs/env')
 const config = require('../config')
 const DSNParser = require('dsn-parser')
 const Sequelize = require('sequelize')

@@ -42,5 +42,9 @@
         "elastic_url": "",
         "kibana_url": "",
         "logstash_url": ""
+    },
+    "logstash":{
+        "logstash_host":"",
+        "logstash_port":""
     }
 }

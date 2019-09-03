@@ -202,6 +202,20 @@ const schema = convict({
             default: '',
             env: 'LOGSTASH_URL'
         },
+    },
+    logstash: {
+        logstash_host: {
+            doc: 'Logstash URL',
+            format: String,
+            default: '',
+            env: 'LOGSTASH_URL'
+        },
+        logstash_port: {
+            doc: 'Logstash Post',
+            format: 'port',
+            default: 5000,
+            env: 'LOGSTASH_PORT'
+        }
     }
 })
 

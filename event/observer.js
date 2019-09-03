@@ -1,9 +1,9 @@
 const consumerEventHandler = require('../controllers/consumer')
 
 const init = () => {
-    console.log('Observer running');
-    initEventListener();
-};
+    console.log('Observer running')
+    initEventListener()
+}
 const initEventListener = async () => {
     try {
         await consumerEventHandler.consumerEvent()
@@ -11,8 +11,8 @@ const initEventListener = async () => {
     } catch (err) {
         console.log(err)
     }
-};
+}
 
 module.exports = {
     init: init
-};
+}

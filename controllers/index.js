@@ -2,8 +2,15 @@ const dbMongo = require('../database/mongoConnection')
 const dbMysql = require('../database/mysqlConnection')
 const config = require('../config')
 const auth = require('../helpers/auth-jwt')
+const logger = require('../helpers/logger')
 
 const getIndex = async (req, res) => {
+    const data = {
+        date: new Date(),
+        user: 'telkom',
+        items: ['one','two']
+    }
+    // logger.logger('status').info('info', 'user in', data)
     res.send({
         status: true,
         statusCode: 200,
